@@ -1,26 +1,27 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useContext } from "react";
+import { Button, Container, Typography } from "@material-ui/core";
+import DrawerContext from "./Context/Drawer";
 
-function App() {
+const App: React.FC = () => {
+  const { setDrawerState } = useContext(DrawerContext)!;
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <Container style={{ paddingTop: "180px" }}>
+      <Typography variant="h1" color="textPrimary">
+        Welcome to Amazon Clone
+      </Typography>
+      <div style={{ textAlign: "center" }}>
+        <Button
+          variant="contained"
+          style={{ marginTop: "100px" }}
+          onClick={() => setDrawerState(-1)}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
+          <Typography variant="h2" color="textSecondary">
+            All Categories
+          </Typography>
+        </Button>
+      </div>
+    </Container>
   );
-}
+};
 
 export default App;

@@ -1,0 +1,182 @@
+[
+  {
+    "category": "Home",
+    "subCategories": [
+      { "name": "Home Décor", "id": 0 },
+      { "name": "Home Textiles", "id": 1 },
+      { "name": "Bath", "id": 2 },
+      { "name": "Furniture", "id": 6 },
+      { "name": "Bedding & Linen", "id": 9 },
+      { "name": "Arts & Crafts", "id": 10 },
+      { "name": "Waste & Recycling", "id": 14 },
+      { "name": "Laundry, Steaming & Ironing", "id": 18 },
+      { "name": "Religious Items", "id": 20 },
+      { "name": "Household Appliances", "id": 21 },
+      { "name": "Storage & Organisation", "id": 25 }
+    ],
+    "count": 300,
+    "id": 0
+  },
+  {
+    "category": "Lighting",
+    "subCategories": [{ "name": "Indoor Lighting", "id": 3 }],
+    "count": 300,
+    "id": 1
+  },
+  {
+    "category": "Beauty",
+    "subCategories": [
+      { "name": "Tools & Accessories", "id": 4 },
+      { "name": "Manicure & Pedicure", "id": 11 },
+      { "name": "Hair Care", "id": 13 },
+      { "name": "Makeup", "id": 15 },
+      { "name": "Skin Care", "id": 32 },
+      { "name": "Bath & Body", "id": 33 },
+      { "name": "Fragrances", "id": 38 }
+    ],
+    "count": 300,
+    "id": 2
+  },
+  {
+    "category": "Health, Household & Personal Care",
+    "subCategories": [
+      { "name": "Household & Cleaning", "id": 5 },
+      { "name": "Medical Supplies & Equipment", "id": 16 },
+      { "name": "Medication & Remedies", "id": 22 },
+      { "name": "Vitamins & Supplements", "id": 30 },
+      { "name": "Feminine Hygiene", "id": 35 },
+      { "name": "Shaving & Hair Removal", "id": 37 },
+      { "name": "Dental Care", "id": 39 },
+      { "name": "Sex & Sensuality", "id": 47 }
+    ],
+    "count": 300,
+    "id": 3
+  },
+  {
+    "category": "Garden",
+    "subCategories": [
+      { "name": "Garden & Patio Furniture", "id": 7 },
+      { "name": "Gardening", "id": 29 },
+      { "name": "Barbecue & Outdoor Dining", "id": 58 }
+    ],
+    "count": 158,
+    "id": 4
+  },
+  {
+    "category": "Home Improvement",
+    "subCategories": [
+      { "name": "Hardware", "id": 8 },
+      { "name": "Fireplaces & Gas Stoves", "id": 17 },
+      { "name": "Safety & Security", "id": 31 },
+      { "name": "Kitchen & Bath Fixtures", "id": 54 }
+    ],
+    "count": 300,
+    "id": 5
+  },
+  {
+    "category": "Clothing, Shoes & Accessories",
+    "subCategories": [
+      { "name": "Shoe, Jewellery & Watch Accessories", "id": 12 },
+      { "name": "Novelty & Special Use", "id": 24 },
+      { "name": "Luggage & Travel Gear", "id": 27 },
+      { "name": "Women", "id": 43 },
+      { "name": "Uniforms, Work & Safety", "id": 46 }
+    ],
+    "count": 300,
+    "id": 6
+  },
+  {
+    "category": "Kitchen & Dining",
+    "subCategories": [{ "name": "Kitchen Storage & Organisation", "id": 19 }],
+    "count": 300,
+    "id": 7
+  },
+  {
+    "category": "Baby",
+    "subCategories": [
+      { "name": "Nursing & Feeding", "id": 23 },
+      { "name": "Nursery", "id": 26 },
+      { "name": "Nappy Changing", "id": 28 },
+      { "name": "Baby Care", "id": 34 }
+    ],
+    "count": 148,
+    "id": 8
+  },
+  {
+    "category": "Toys & Games",
+    "subCategories": [
+      { "name": "Plush", "id": 36 },
+      { "name": "Games", "id": 48 },
+      { "name": "Arts & Crafts", "id": 52 },
+      { "name": "Die-Cast & Toy Vehicles", "id": 60 }
+    ],
+    "count": 8,
+    "id": 9
+  },
+  {
+    "category": "Medical Supplies & Equipment",
+    "subCategories": [{ "name": "Mobility & Daily Living Aids", "id": 40 }],
+    "count": 8,
+    "id": 10
+  },
+  {
+    "category": "Pet Supplies",
+    "subCategories": [{ "name": "Dogs", "id": 41 }],
+    "count": 5,
+    "id": 11
+  },
+  {
+    "category": "Stationery & Office Products",
+    "subCategories": [
+      { "name": "Office Supplies", "id": 42 },
+      { "name": "Office Paper Products", "id": 45 },
+      { "name": "Calendars, Planners & Personal Organisers", "id": 49 }
+    ],
+    "count": 17,
+    "id": 12
+  },
+  {
+    "category": "Electronics",
+    "subCategories": [
+      { "name": "Mobile Phones & Communication", "id": 44 },
+      { "name": "Wearable Technology", "id": 61 }
+    ],
+    "count": 3,
+    "id": 13
+  },
+  {
+    "category": "Computers",
+    "subCategories": [{ "name": "Accessories", "id": 50 }],
+    "count": 2,
+    "id": 14
+  },
+  {
+    "category": "Sports, Fitness & Outdoors",
+    "subCategories": [
+      { "name": "Sports Technology", "id": 51 },
+      { "name": "Camping & Hiking", "id": 53 },
+      { "name": "Exercise & Fitness", "id": 55 },
+      { "name": "Fan Shop", "id": 62 }
+    ],
+    "count": 11,
+    "id": 15
+  },
+  {
+    "category": "Automotive",
+    "subCategories": [{ "name": "Motorbikes, Accessories & Parts", "id": 56 }],
+    "count": 1,
+    "id": 16
+  },
+  {
+    "category": "Pantry Food & Drinks",
+    "subCategories": [{ "name": "Baby Food", "id": 57 }],
+    "count": 1,
+    "id": 17
+  },
+  {
+    "category": "CDs & Vinyl",
+    "subCategories": [{ "name": "Indie & Alternative", "id": 59 }],
+    "count": 1,
+    "id": 18
+  }
+]
