@@ -3,7 +3,6 @@ import {
   AppBar,
   IconButton,
   InputBase,
-  Link,
   Toolbar,
   Typography,
 } from "@material-ui/core";
@@ -16,6 +15,7 @@ import categories from "../../Data/productSubCategories.json";
 import DrawerContext from "../../Context/Drawer";
 import SearchInCategoryContext from "../../Context/SearchInCategory";
 import CategoriesDrawer from "./CategoriesDrawer";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -84,7 +84,7 @@ const Navbar: React.FC = () => {
         <Typography
           variant="h5"
           component={Link}
-          href="/"
+          to="/"
           className={classes.title}
         >
           Amazon Clone

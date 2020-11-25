@@ -1,11 +1,11 @@
+import { Button, Typography } from "@material-ui/core";
 import React, { useContext } from "react";
-import { Button, Container, Typography } from "@material-ui/core";
-import DrawerContext from "./Context/Drawer";
+import DrawerContext from "../Context/Drawer";
 
-const App: React.FC = () => {
+const Home: React.FC = () => {
   const { setDrawerState } = useContext(DrawerContext)!;
   return (
-    <Container style={{ paddingTop: "180px" }}>
+    <>
       <Typography variant="h1" color="textPrimary">
         Welcome to Amazon Clone
       </Typography>
@@ -20,8 +20,7 @@ const App: React.FC = () => {
           </Typography>
         </Button>
       </div>
-    </Container>
+    </>
   );
 };
-
-export default App;
+export default Home;

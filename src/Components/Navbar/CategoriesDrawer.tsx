@@ -11,9 +11,11 @@ import React, { useMemo, useContext } from "react";
 import { ArrowBackRounded } from "@material-ui/icons";
 import categories from "../../Data/productCategoriesArr.json";
 import DrawerContext from "../../Context/Drawer";
+import { useHistory } from "react-router-dom";
 
 const CategoriesDrawer: React.FC = () => {
   const { drawerState, setDrawerState } = useContext(DrawerContext)!;
+  const history = useHistory();
 
   const mainCatDrawer = useMemo(
     () => (
@@ -64,6 +66,7 @@ const CategoriesDrawer: React.FC = () => {
                 key={subCat.id}
                 button
                 onClick={() => {
+                  history.push(`/categories/${subCat.id}`);
                   setDrawerState(null);
                 }}
               >
@@ -73,7 +76,7 @@ const CategoriesDrawer: React.FC = () => {
           </List>
         </div>
       )),
-    [setDrawerState]
+    [setDrawerState, history]
   );
 
   return (

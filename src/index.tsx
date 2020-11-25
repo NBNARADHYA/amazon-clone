@@ -1,20 +1,31 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./App";
+import { BrowserRouter } from "react-router-dom";
+import Routes from "./Routes";
 import Footer from "./Components/Footer";
 import Navbar from "./Components/Navbar";
 import { DrawerProvider } from "./Context/Drawer";
 import { SearchInCategoryProvider } from "./Context/SearchInCategory";
+import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+
+const client = new ApolloClient({
+  uri: "http://localhost:5000/graphql",
+  cache: new InMemoryCache(),
+});
 
 ReactDOM.render(
-  <DrawerProvider>
-    <SearchInCategoryProvider>
-      <div style={{ minHeight: "99vh", position: "relative" }}>
-        <Navbar />
-        <App />
-        <Footer />
-      </div>
-    </SearchInCategoryProvider>
-  </DrawerProvider>,
+  <ApolloProvider client={client}>
+    <DrawerProvider>
+      <SearchInCategoryProvider>
+        <BrowserRouter>
+          <div style={{ minHeight: "99vh", position: "relative" }}>
+            <Navbar />
+            <Routes />
+            <Footer />
+          </div>
+        </BrowserRouter>
+      </SearchInCategoryProvider>
+    </DrawerProvider>
+  </ApolloProvider>,
   document.getElementById("root")
 );

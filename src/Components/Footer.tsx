@@ -1,6 +1,7 @@
 import React from "react";
-import { Link, Typography } from "@material-ui/core";
+import { Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles(() => ({
   footer: {
@@ -24,7 +25,7 @@ const Copyright: React.FC = () => {
   return (
     <Typography variant="body1" align="center">
       {"Copyright © "}
-      <Link className={classes.link} href="/">
+      <Link className={classes.link} to="/">
         Amazon Clone
       </Link>{" "}
       {new Date().getFullYear()}
