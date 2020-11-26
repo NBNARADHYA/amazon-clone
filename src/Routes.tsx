@@ -1,18 +1,19 @@
 import React from "react";
-import { Container } from "@material-ui/core";
 import Home from "./Components/Home";
 import { Redirect, Route, Switch } from "react-router-dom";
+import Category from "./Components/Category";
 
 const Routes: React.FC = () => {
   return (
-    <Container style={{ paddingTop: "180px" }}>
-      <Switch>
-        <Route exact path="/">
-          <Home />
-        </Route>
-        <Redirect to="/" />
-      </Switch>
-    </Container>
+    <Switch>
+      <Route exact path="/">
+        <Home />
+      </Route>
+      <Route path="/categories/:category">
+        <Category />
+      </Route>
+      <Redirect to="/" />
+    </Switch>
   );
 };
 

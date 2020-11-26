@@ -1,0 +1,21 @@
+query Products($category: String!, $order: Int, $skip: Int!, $take: Int!) {
+  products(category: $category, order: $order, skip: $skip, take: $take) {
+    count
+    products {
+      crawlTimeStamp
+      id
+      nameSource
+      retailer
+      category
+      brand
+      name
+      price
+      url
+      description
+      currency
+      imageUrl
+      tags
+      contents
+    }
+  }
+}

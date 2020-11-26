@@ -19,9 +19,11 @@ ReactDOM.render(
       <SearchInCategoryProvider>
         <BrowserRouter>
           <div style={{ minHeight: "99vh", position: "relative" }}>
-            <Navbar />
-            <Routes />
-            <Footer />
+            <div style={{ paddingBottom: "6vh", paddingTop: "7vh" }}>
+              <Navbar />
+              <Routes />
+              <Footer />
+            </div>
           </div>
         </BrowserRouter>
       </SearchInCategoryProvider>

@@ -66,7 +66,7 @@ const CategoriesDrawer: React.FC = () => {
                 key={subCat.id}
                 button
                 onClick={() => {
-                  history.push(`/categories/${subCat.id}`);
+                  history.push(`/categories/${category}>${subCat.name}`);
                   setDrawerState(null);
                 }}
               >
