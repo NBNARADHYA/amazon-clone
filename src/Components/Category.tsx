@@ -1,3 +1,4 @@
+import { QueryHookOptions } from "@apollo/client";
 import {
   Divider,
   FormControl,
@@ -9,9 +10,10 @@ import {
   CircularProgress,
 } from "@material-ui/core";
 import { Pagination } from "@material-ui/lab";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useProductsQuery } from "../generated/graphql";
+import SearchInCategoryContext from "../Context/SearchInCategory";
+import { Exact, ProductsQuery, useProductsQuery } from "../generated/graphql";
 
 const useStyles = makeStyles(() => ({
   pagination: {
@@ -59,13 +61,31 @@ const Category: React.FC = () => {
   const [page, setPage] = useState(1);
   const [order, setOrder] = useState<number | null>(null);
 
-  const { data, loading, error } = useProductsQuery({
+  const { searchInCatString } = useContext(SearchInCategoryContext)!;
+
+  const options: QueryHookOptions<
+    ProductsQuery,
+    Exact<{
+      category: string;
+      order?: number | null | undefined;
+      skip: number;
+      take: number;
+      search?: string | null | undefined;
+    }>
+  > = {
     variables: { category, order, skip: 20 * (page - 1), take: 20 },
-  });
+  };
+
+  if (searchInCatString !== "") {
+    options.fetchPolicy = "no-cache";
+    options.variables!.search = searchInCatString;
+  }
+
+  const { data, loading, error } = useProductsQuery(options);
 
   useEffect(() => {
     setPage(1);
-  }, [category]);
+  }, [category, searchInCatString]);
 
   if (error) {
     console.log(error);
@@ -76,8 +96,6 @@ const Category: React.FC = () => {
   }
 
   // const [sortedProducts, setSortedProducts] = useState(products)
-
-  // const { searchInCatString } = useContext(SearchInCategoryContext)!;
 
   // useEffect(() => {
   //   if (sortBy !== "") {

@@ -1,5 +1,17 @@
-query Products($category: String!, $order: Int, $skip: Int!, $take: Int!) {
-  products(category: $category, order: $order, skip: $skip, take: $take) {
+query Products(
+  $category: String!
+  $order: Int
+  $skip: Int!
+  $take: Int!
+  $search: String
+) {
+  products(
+    category: $category
+    order: $order
+    skip: $skip
+    take: $take
+    search: $search
+  ) {
     count
     products {
       crawlTimeStamp

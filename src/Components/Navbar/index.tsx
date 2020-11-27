@@ -11,11 +11,10 @@ import {
   MenuRounded as MenuIcon,
   SearchRounded as SearchIcon,
 } from "@material-ui/icons";
-import categories from "../../Data/productSubCategories.json";
 import DrawerContext from "../../Context/Drawer";
 import SearchInCategoryContext from "../../Context/SearchInCategory";
 import CategoriesDrawer from "./CategoriesDrawer";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -60,19 +59,19 @@ const Navbar: React.FC = () => {
   const [searchString, setSearchString] = useState("");
   const classes = useStyles();
 
-  const path: string = "/ad/";
+  const location = useLocation();
 
-  const pathArray = path.split("/");
+  const pathArray = location.pathname.split("/");
 
   const catPlaceHolder =
     pathArray.length === 3 && pathArray[1] === "categories"
-      ? categories[Number(pathArray[2])]
+      ? pathArray[2].split(">")[1]
       : "All products";
 
   useEffect(() => {
     setSearchInCatString("");
     setSearchString("");
-  }, [path, setSearchInCatString]);
+  }, [setSearchInCatString]);
 
   return (
     <AppBar className={classes.appBar}>
@@ -101,7 +100,12 @@ const Navbar: React.FC = () => {
             className={classes.search}
             placeholder={`Search ${catPlaceHolder}`}
             value={searchString}
-            onChange={(e) => setSearchString(e.target.value)}
+            onChange={(e) => {
+              setSearchString(e.target.value);
+              if (e.target.value === "") {
+                setSearchInCatString("");
+              }
+            }}
           />
           <IconButton className={classes.searchBtn} type="submit">
             <SearchIcon />

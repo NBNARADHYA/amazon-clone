@@ -26,6 +26,7 @@ export type QueryProductsArgs = {
   order?: Maybe<Scalars['Int']>;
   skip: Scalars['Int'];
   take: Scalars['Int'];
+  search?: Maybe<Scalars['String']>;
 };
 
 export type Cart = {
@@ -164,6 +165,7 @@ export type ProductsQueryVariables = Exact<{
   order?: Maybe<Scalars['Int']>;
   skip: Scalars['Int'];
   take: Scalars['Int'];
+  search?: Maybe<Scalars['String']>;
 }>;
 
 
@@ -181,8 +183,14 @@ export type ProductsQuery = (
 
 
 export const ProductsDocument = gql`
-    query Products($category: String!, $order: Int, $skip: Int!, $take: Int!) {
-  products(category: $category, order: $order, skip: $skip, take: $take) {
+    query Products($category: String!, $order: Int, $skip: Int!, $take: Int!, $search: String) {
+  products(
+    category: $category
+    order: $order
+    skip: $skip
+    take: $take
+    search: $search
+  ) {
     count
     products {
       crawlTimeStamp
@@ -220,6 +228,7 @@ export const ProductsDocument = gql`
  *      order: // value for 'order'
  *      skip: // value for 'skip'
  *      take: // value for 'take'
+ *      search: // value for 'search'
  *   },
  * });
  */
