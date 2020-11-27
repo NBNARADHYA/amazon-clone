@@ -176,7 +176,7 @@ export type ProductsQuery = (
     & Pick<FetchProductsOutput, 'count'>
     & { products: Array<(
       { __typename?: 'Product' }
-      & Pick<Product, 'crawlTimeStamp' | 'id' | 'nameSource' | 'retailer' | 'category' | 'brand' | 'name' | 'price' | 'url' | 'description' | 'currency' | 'imageUrl' | 'tags' | 'contents'>
+      & Pick<Product, 'id' | 'name' | 'price' | 'currency' | 'imageUrl'>
     )> }
   ) }
 );
@@ -193,20 +193,11 @@ export const ProductsDocument = gql`
   ) {
     count
     products {
-      crawlTimeStamp
       id
-      nameSource
-      retailer
-      category
-      brand
       name
       price
-      url
-      description
       currency
       imageUrl
-      tags
-      contents
     }
   }
 }

@@ -95,38 +95,6 @@ const Category: React.FC = () => {
     return <CircularProgress color="secondary" className={classes.spinner} />;
   }
 
-  // const [sortedProducts, setSortedProducts] = useState(products)
-
-  // useEffect(() => {
-  //   if (sortBy !== "") {
-  //     setSortedProducts(
-  //       products.slice().sort((a, b) => {
-  //         const priceOfA: number = +a.product_price
-  //         const priceOfB: number = +b.product_price
-
-  //         return sortBy === 1 ? priceOfA - priceOfB : priceOfA - priceOfB
-  //       })
-  //     )
-  //   } else {
-  //     setSortedProducts(products)
-  //   }
-  // }, [sortBy, products])
-
-  // useEffect(() => {
-  //   if (searchInCatString !== "") {
-  //     setSortedProducts(prevSortedProducts =>
-  //       prevSortedProducts.filter(
-  //         product =>
-  //           product.product_name
-  //             .toLowerCase()
-  //             .indexOf(searchInCatString.toLowerCase()) !== -1
-  //       )
-  //     )
-  //   } else {
-  //     setSortedProducts(products)
-  //   }
-  // }, [searchInCatString, products])
-
   return (
     <div>
       <FormControl className={classes.formControl}>

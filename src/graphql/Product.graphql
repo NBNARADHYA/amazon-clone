@@ -14,20 +14,11 @@ query Products(
   ) {
     count
     products {
-      crawlTimeStamp
       id
-      nameSource
-      retailer
-      category
-      brand
       name
       price
-      url
-      description
       currency
       imageUrl
-      tags
-      contents
     }
   }
 }
