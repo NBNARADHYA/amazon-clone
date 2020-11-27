@@ -6,3 +6,16 @@ mutation SignUp($user: SignUpInputType!) {
     lastName
   }
 }
+
+mutation Login($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    email
+    firstName
+    lastName
+    accessToken
+  }
+}
+
+mutation Logout {
+  logout
+}

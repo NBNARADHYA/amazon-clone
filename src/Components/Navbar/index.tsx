@@ -15,7 +15,9 @@ import {
 import DrawerContext from "../../Context/Drawer";
 import SearchInCategoryContext from "../../Context/SearchInCategory";
 import CategoriesDrawer from "./CategoriesDrawer";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
+import AccessTokenContext from "../../Context/AccessToken";
+import { useLogoutMutation } from "../../generated/graphql";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -52,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
     width: "70%",
   },
   signUpBtn: {
-    marginLeft: "240px",
+    marginLeft: "170px",
   },
 }));
 
@@ -63,7 +65,12 @@ const Navbar: React.FC = () => {
   const [searchString, setSearchString] = useState("");
   const classes = useStyles();
 
+  const history = useHistory();
   const location = useLocation();
+
+  const { accessToken, setAccessToken } = useContext(AccessTokenContext)!;
+
+  const [logout] = useLogoutMutation({ fetchPolicy: "no-cache" });
 
   const pathArray = location.pathname.split("/");
 
@@ -116,13 +123,19 @@ const Navbar: React.FC = () => {
           </IconButton>
         </form>
         <Button
-          to="/signup"
-          component={Link}
-          color="inherit"
+          variant="contained"
           className={classes.signUpBtn}
-          size="large"
+          size="medium"
+          onClick={async () => {
+            if (accessToken) {
+              await logout();
+              return setAccessToken(null);
+            } else {
+              return history.push("/login");
+            }
+          }}
         >
-          SignUp
+          {accessToken ? "Logout" : "Login or signup"}
         </Button>
       </Toolbar>
     </AppBar>

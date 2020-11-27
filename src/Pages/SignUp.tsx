@@ -37,7 +37,7 @@ const SignUp: React.FC<RouteComponentProps> = ({ history }) => {
 
   const classes = useStyles();
 
-  const [signUp, { error }] = useSignUpMutation();
+  const [signUp, { error }] = useSignUpMutation({ fetchPolicy: "no-cache" });
 
   if (error) {
     return <div>{JSON.stringify(error, null, 2)}</div>;
