@@ -22,3 +22,22 @@ query Products(
     }
   }
 }
+
+query Product($id: String!) {
+  product(id: $id) {
+    crawlTimeStamp
+    id
+    nameSource
+    retailer
+    category
+    brand
+    name
+    price
+    url
+    description
+    currency
+    imageUrl
+    tags
+    contents
+  }
+}
