@@ -9,11 +9,9 @@ import {
   CircularProgress,
 } from "@material-ui/core";
 import { Pagination } from "@material-ui/lab";
-import React, { useContext, useEffect, useState } from "react";
-import { Link, useHistory, useLocation, useParams } from "react-router-dom";
-import SearchInCategoryContext from "../Context/SearchInCategory";
+import React, { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { useProductsQuery } from "../generated/graphql";
-import queryString from "query-string";
 
 const useStyles = makeStyles(() => ({
   pagination: {
@@ -57,24 +55,17 @@ const Category: React.FC = () => {
   const classes = useStyles();
 
   const { category } = useParams<{ category: string }>();
-  const history = useHistory();
-  const location = useLocation();
 
   const [page, setPage] = useState(1);
   const [order, setOrder] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (location.search) {
-      const query = queryString.parse(location.search);
-      if (query.pg) {
-        setPage(+query.pg);
-      }
-    }
-  }, [location.search]);
-
   const { data, loading, error } = useProductsQuery({
     variables: { category, order, skip: 20 * (page - 1), take: 20 },
   });
+
+  useEffect(() => {
+    setPage(1);
+  }, [category]);
 
   if (error) {
     console.log(error);
@@ -164,7 +155,7 @@ const Category: React.FC = () => {
             page={page}
             shape="rounded"
             count={Math.ceil(data.products.count / 20)}
-            onChange={(_, v) => history.push(`${location.pathname}?pg=${v}`)}
+            onChange={(_, page) => setPage(page)}
           />
         </div>
       )}

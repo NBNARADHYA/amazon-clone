@@ -6,12 +6,8 @@ import Footer from "./Components/Footer";
 import Navbar from "./Components/Navbar";
 import { DrawerProvider } from "./Context/Drawer";
 import { SearchInCategoryProvider } from "./Context/SearchInCategory";
-import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
-
-const client = new ApolloClient({
-  uri: "http://localhost:5000/graphql",
-  cache: new InMemoryCache(),
-});
+import { ApolloProvider } from "@apollo/client";
+import { client } from "./apollo/Client";
 
 ReactDOM.render(
   <ApolloProvider client={client}>
