@@ -1,21 +1,19 @@
 import React from "react";
-import Home from "./Components/Home";
+import Home from "./Pages/Home";
 import { Redirect, Route, Switch } from "react-router-dom";
-import Category from "./Components/Category";
-import Product from "./Components/Product";
+import Category from "./Pages/Category";
+import Product from "./Pages/Product";
+import SignUp from "./Pages/SignUp";
+import Login from "./Pages/Login";
 
 const Routes: React.FC = () => {
   return (
     <Switch>
-      <Route exact path="/">
-        <Home />
-      </Route>
-      <Route path="/categories/:category">
-        <Category />
-      </Route>
-      <Route path="/products/:id">
-        <Product />
-      </Route>
+      <Route exact path="/" component={Home} />
+      <Route path="/categories/:category" component={Category} />
+      <Route path="/products/:id" component={Product} />
+      <Route path="/signup" component={SignUp} />
+      <Route path="/login" component={Login} />
       <Redirect to="/" />
     </Switch>
   );

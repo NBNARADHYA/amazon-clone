@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
   AppBar,
+  Button,
   IconButton,
   InputBase,
   Toolbar,
@@ -49,6 +50,9 @@ const useStyles = makeStyles((theme) => ({
   },
   searchForm: {
     width: "70%",
+  },
+  signUpBtn: {
+    marginLeft: "240px",
   },
 }));
 
@@ -111,6 +115,15 @@ const Navbar: React.FC = () => {
             <SearchIcon />
           </IconButton>
         </form>
+        <Button
+          to="/signup"
+          component={Link}
+          color="inherit"
+          className={classes.signUpBtn}
+          size="large"
+        >
+          SignUp
+        </Button>
       </Toolbar>
     </AppBar>
   );
