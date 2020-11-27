@@ -7,7 +7,7 @@ import {
 } from "@material-ui/core";
 import { Field, Form, Formik } from "formik";
 import React, { useContext } from "react";
-import { RouteComponentProps } from "react-router-dom";
+import { Link, RouteComponentProps } from "react-router-dom";
 import AccessTokenContext from "../Context/AccessToken";
 import { useLoginMutation } from "../generated/graphql";
 
@@ -65,6 +65,10 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
           try {
             const response = await login({ variables: { email, password } });
             setAccessToken(response.data!.login.accessToken);
+            localStorage.setItem(
+              "accessToken",
+              response.data!.login.accessToken
+            );
             history.push("/");
           } finally {
             setSubmitting(false);
@@ -92,6 +96,14 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
               fullWidth
             />
             <br />
+            <Typography
+              variant="overline"
+              color="textSecondary"
+              component={Link}
+              to="/signup"
+            >
+              Not signed up ?
+            </Typography>
             <br />
             <Button
               type="submit"

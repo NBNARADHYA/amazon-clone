@@ -122,21 +122,24 @@ const Navbar: React.FC = () => {
             <SearchIcon />
           </IconButton>
         </form>
-        <Button
-          variant="contained"
-          className={classes.signUpBtn}
-          size="medium"
-          onClick={async () => {
-            if (accessToken) {
-              await logout();
-              return setAccessToken(null);
-            } else {
-              return history.push("/login");
-            }
-          }}
-        >
-          {accessToken ? "Logout" : "Login or signup"}
-        </Button>
+        {pathArray[1] !== "login" && pathArray[1] !== "signup" && (
+          <Button
+            variant="contained"
+            className={classes.signUpBtn}
+            size="medium"
+            onClick={async () => {
+              if (accessToken) {
+                await logout();
+                localStorage.removeItem("accessToken");
+                setAccessToken(null);
+              } else {
+                history.push("/login");
+              }
+            }}
+          >
+            {accessToken ? "Logout" : "Login or signup"}
+          </Button>
+        )}
       </Toolbar>
     </AppBar>
   );

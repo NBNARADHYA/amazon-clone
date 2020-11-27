@@ -11,8 +11,8 @@ import { client } from "./apollo/Client";
 import { AccessTokenProvider } from "./Context/AccessToken";
 
 ReactDOM.render(
-  <AccessTokenProvider>
-    <ApolloProvider client={client}>
+  <ApolloProvider client={client}>
+    <AccessTokenProvider>
       <DrawerProvider>
         <SearchInCategoryProvider>
           <BrowserRouter>
@@ -26,7 +26,7 @@ ReactDOM.render(
           </BrowserRouter>
         </SearchInCategoryProvider>
       </DrawerProvider>
-    </ApolloProvider>
-  </AccessTokenProvider>,
+    </AccessTokenProvider>
+  </ApolloProvider>,
   document.getElementById("root")
 );

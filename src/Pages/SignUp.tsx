@@ -7,7 +7,7 @@ import {
 } from "@material-ui/core";
 import { Field, Form, Formik } from "formik";
 import React from "react";
-import { RouteComponentProps } from "react-router-dom";
+import { Link, RouteComponentProps } from "react-router-dom";
 import { SignUpInputType, useSignUpMutation } from "../generated/graphql";
 
 const useStyles = makeStyles(() => ({
@@ -103,6 +103,14 @@ const SignUp: React.FC<RouteComponentProps> = ({ history }) => {
               fullWidth
             />
             <br />
+            <Typography
+              variant="overline"
+              color="textSecondary"
+              component={Link}
+              to="/login"
+            >
+              Already signed up ?
+            </Typography>
             <br />
             <Button
               type="submit"
