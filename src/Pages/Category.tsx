@@ -8,6 +8,7 @@ import {
   Select,
   Typography,
   CircularProgress,
+  Container,
 } from "@material-ui/core";
 import { Pagination } from "@material-ui/lab";
 import React, { useContext, useEffect, useState } from "react";
@@ -96,7 +97,7 @@ const Category: React.FC = () => {
   }
 
   return (
-    <div>
+    <Container>
       <FormControl className={classes.formControl}>
         <InputLabel>Sort By</InputLabel>
         <Select
@@ -145,7 +146,7 @@ const Category: React.FC = () => {
           />
         </div>
       )}
-    </div>
+    </Container>
   );
 };
 

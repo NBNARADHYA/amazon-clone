@@ -8,7 +8,9 @@ interface AccessTokenContextType {
 const AccessTokenContext = createContext<AccessTokenContextType | null>(null);
 
 const AccessTokenProvider: React.FC = ({ children }) => {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(
+    localStorage.getItem("accessToken")
+  );
 
   return (
     <AccessTokenContext.Provider value={{ accessToken, setAccessToken }}>

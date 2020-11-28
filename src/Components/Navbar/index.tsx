@@ -18,6 +18,7 @@ import CategoriesDrawer from "./CategoriesDrawer";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import AccessTokenContext from "../../Context/AccessToken";
 import { useLogoutMutation } from "../../generated/graphql";
+import CartIcon from "@material-ui/icons/ShoppingCartSharp";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -53,8 +54,12 @@ const useStyles = makeStyles((theme) => ({
   searchForm: {
     width: "70%",
   },
-  signUpBtn: {
+  signUpBtn: {},
+  cart: {
+    color: "white",
+    fontSize: "large",
     marginLeft: "170px",
+    marginRight: "10px",
   },
 }));
 
@@ -122,6 +127,13 @@ const Navbar: React.FC = () => {
             <SearchIcon />
           </IconButton>
         </form>
+
+        {accessToken && (
+          <IconButton className={classes.cart} component={Link} to="/cart">
+            <CartIcon />
+          </IconButton>
+        )}
+
         {pathArray[1] !== "login" && pathArray[1] !== "signup" && (
           <Button
             variant="contained"

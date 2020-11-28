@@ -5,6 +5,7 @@ import Category from "./Pages/Category";
 import Product from "./Pages/Product";
 import SignUp from "./Pages/SignUp";
 import Login from "./Pages/Login";
+import Cart from "./Pages/Cart";
 
 const Routes: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const Routes: React.FC = () => {
       <Route path="/products/:id" component={Product} />
       <Route path="/signup" component={SignUp} />
       <Route path="/login" component={Login} />
+      <Route path="/cart" component={Cart} />
       <Redirect to="/" />
     </Switch>
   );

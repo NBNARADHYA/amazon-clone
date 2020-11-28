@@ -1,0 +1,26 @@
+mutation AddToCart($cart: ProductInput!) {
+  addToCart(cart: $cart) {
+    id
+    email
+    product
+    nos
+    priceForOne
+  }
+}
+
+mutation UpdateCart($cart: UpdateCartInput!) {
+  updateCart(cart: $cart)
+}
+
+query Cart {
+  cart {
+    nos
+    product {
+      id
+      name
+      price
+      currency
+      imageUrl
+    }
+  }
+}

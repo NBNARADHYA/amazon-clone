@@ -1,5 +1,6 @@
 import {
   Breadcrumbs,
+  Button,
   CircularProgress,
   Container,
   Divider,
@@ -9,7 +10,7 @@ import {
 import { NavigateNext } from "@material-ui/icons";
 import React from "react";
 import { Link, useParams } from "react-router-dom";
-import { useProductQuery } from "../generated/graphql";
+import { useAddToCartMutation, useProductQuery } from "../generated/graphql";
 
 const useStyles = makeStyles(() => ({
   prodContainer: {
@@ -39,6 +40,17 @@ const useStyles = makeStyles(() => ({
     left: "50%",
     marginLeft: "-4em",
   },
+  subTitle: {
+    float: "left",
+  },
+  addToCart: {
+    float: "right",
+    marginBottom: "20px",
+  },
+  body: {
+    clear: "inline-end",
+    overflow: "auto",
+  },
 }));
 
 const Product: React.FC = () => {
@@ -47,6 +59,8 @@ const Product: React.FC = () => {
   const { id } = useParams<{ id: string }>();
 
   const { data, loading, error } = useProductQuery({ variables: { id } });
+
+  const [addToCart] = useAddToCartMutation();
 
   if (error) {
     console.log(error);
@@ -86,20 +100,48 @@ const Product: React.FC = () => {
             <Typography variant="h5" gutterBottom>
               {data.product.name}
             </Typography>
-            <Typography variant="body2" gutterBottom color="textSecondary">
-              Brand: {data.product.brand}
-            </Typography>
-            <Typography color="textSecondary">Price:</Typography>
-            <Typography variant="body1" color="secondary">
-              {data.product.price} {data.product.currency}
-            </Typography>
+            <div className={classes.subTitle}>
+              <Typography variant="body2" gutterBottom color="textSecondary">
+                Brand: {data.product.brand}
+              </Typography>
+              <Typography color="textSecondary">Price:</Typography>
+              <Typography variant="body1" color="secondary">
+                {data.product.price} {data.product.currency}
+              </Typography>
+            </div>
+            <div className={classes.addToCart}>
+              <br />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={async () => {
+                  try {
+                    const res = await addToCart({
+                      variables: {
+                        cart: {
+                          productId: data.product.id,
+                          priceForOne: data.product.price!,
+                        },
+                      },
+                    });
+                    console.log(res.data?.addToCart);
+                  } catch (error) {
+                    console.log(error);
+                  }
+                }}
+              >
+                Add To Cart
+              </Button>
+            </div>
           </div>
-          <Divider />
-          <br />
-          <Typography variant="h6" gutterBottom>
-            About this product
-          </Typography>
-          <Typography variant="body2">{data.product.contents}</Typography>
+          <div className={classes.body}>
+            <Divider />
+            <br />
+            <Typography variant="h6" gutterBottom>
+              About this product
+            </Typography>
+            <Typography variant="body2">{data.product.contents}</Typography>
+          </div>
           <br />
           <Divider className={classes.prodDivider} />
         </div>
