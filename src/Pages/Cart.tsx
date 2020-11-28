@@ -35,7 +35,9 @@ const useStyles = makeStyles(() => ({
 const Cart: React.FC = () => {
   const classes = useStyles();
 
-  const { data, loading, error } = useCartQuery();
+  const { data, loading, error } = useCartQuery({
+    fetchPolicy: "network-only",
+  });
 
   if (loading || !data) {
     return <CircularProgress className={classes.spinner} color="secondary" />;
@@ -43,6 +45,7 @@ const Cart: React.FC = () => {
 
   if (error) {
     console.log(error);
+    return null;
   }
   return (
     <Container>

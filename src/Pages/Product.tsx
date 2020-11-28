@@ -8,8 +8,10 @@ import {
   Typography,
 } from "@material-ui/core";
 import { NavigateNext } from "@material-ui/icons";
-import React from "react";
-import { Link, useParams } from "react-router-dom";
+import React, { useContext } from "react";
+import { Link, RouteComponentProps, useParams } from "react-router-dom";
+import AccessTokenContext from "../Context/AccessToken";
+import CartContext from "../Context/Cart";
 import { useAddToCartMutation, useProductQuery } from "../generated/graphql";
 
 const useStyles = makeStyles(() => ({
@@ -53,10 +55,13 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Product: React.FC = () => {
+const Product: React.FC<RouteComponentProps> = ({ history }) => {
   const classes = useStyles();
 
   const { id } = useParams<{ id: string }>();
+
+  const { cart, setCart } = useContext(CartContext)!;
+  const { accessToken } = useContext(AccessTokenContext)!;
 
   const { data, loading, error } = useProductQuery({ variables: { id } });
 
@@ -115,8 +120,13 @@ const Product: React.FC = () => {
                 variant="contained"
                 color="primary"
                 onClick={async () => {
+                  if (!accessToken) {
+                    history.push("/login");
+                    return;
+                  }
+                  if (cart[data.product.id]) return;
                   try {
-                    const res = await addToCart({
+                    await addToCart({
                       variables: {
                         cart: {
                           productId: data.product.id,
@@ -124,13 +134,21 @@ const Product: React.FC = () => {
                         },
                       },
                     });
-                    console.log(res.data?.addToCart);
+                    setCart((prev) => {
+                      const newCart = { ...prev };
+                      newCart[data.product.id] = true;
+                      return newCart;
+                    });
                   } catch (error) {
                     console.log(error);
                   }
                 }}
               >
-                Add To Cart
+                {!accessToken
+                  ? "Login to add to cart"
+                  : !cart[data.product.id]
+                  ? "Add to Cart"
+                  : "Checkout cart"}
               </Button>
             </div>
           </div>

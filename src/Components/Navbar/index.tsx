@@ -54,7 +54,10 @@ const useStyles = makeStyles((theme) => ({
   searchForm: {
     width: "70%",
   },
-  signUpBtn: {},
+  signUpBtn: {
+    position: "absolute",
+    right: "15px",
+  },
   cart: {
     color: "white",
     fontSize: "large",
@@ -74,6 +77,13 @@ const Navbar: React.FC = () => {
   const location = useLocation();
 
   const { accessToken, setAccessToken } = useContext(AccessTokenContext)!;
+
+  useEffect(() => {
+    const localAccessToken = localStorage.getItem("accessToken");
+    if (localAccessToken !== accessToken) {
+      setAccessToken(localAccessToken);
+    }
+  });
 
   const [logout] = useLogoutMutation({ fetchPolicy: "no-cache" });
 
@@ -144,9 +154,8 @@ const Navbar: React.FC = () => {
                 await logout();
                 localStorage.removeItem("accessToken");
                 setAccessToken(null);
-              } else {
-                history.push("/login");
               }
+              history.push("/login");
             }}
           >
             {accessToken ? "Logout" : "Login or signup"}

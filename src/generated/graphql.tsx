@@ -89,6 +89,7 @@ export type Mutation = {
   createOrder: Array<OrderContent>;
   cancelOrder: Scalars['Boolean'];
   updateOrder: Scalars['Boolean'];
+  refreshToken: RefreshTokenOutput;
 };
 
 
@@ -170,6 +171,12 @@ export type ProductInput = {
 export type UpdateCartInput = {
   productId: Scalars['String'];
   nos: Scalars['Int'];
+};
+
+export type RefreshTokenOutput = {
+  __typename?: 'RefreshTokenOutput';
+  error?: Maybe<Scalars['String']>;
+  accessToken?: Maybe<Scalars['String']>;
 };
 
 export type AddToCartMutationVariables = Exact<{
