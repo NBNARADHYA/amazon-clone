@@ -16,12 +16,17 @@ ReactDOM.render(
       <DrawerProvider>
         <SearchInCategoryProvider>
           <BrowserRouter>
-            <div style={{ minHeight: "99vh", position: "relative" }}>
-              <div style={{ paddingBottom: "6vh", paddingTop: "7vh" }}>
-                <Navbar />
-                <Routes />
-                <Footer />
-              </div>
+            <div
+              style={{
+                minHeight: "99vh",
+                position: "relative",
+                paddingBottom: "6vh",
+                paddingTop: "7vh",
+              }}
+            >
+              <Navbar />
+              <Routes />
+              <Footer />
             </div>
           </BrowserRouter>
         </SearchInCategoryProvider>

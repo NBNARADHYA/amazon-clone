@@ -22,10 +22,9 @@ const useStyles = makeStyles(() => ({
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: "10px",
     position: "absolute",
     bottom: "6vh",
-    marginTop: 20,
+    marginTop: 30,
   },
   productImg: {
     height: "165px",
@@ -97,45 +96,47 @@ const Category: React.FC = () => {
   }
 
   return (
-    <Container>
-      <FormControl className={classes.formControl}>
-        <InputLabel>Sort By</InputLabel>
-        <Select
-          value={order ? order : ""}
-          onChange={(e) => setOrder(e.target.value as number)}
-        >
-          <MenuItem value={1}>Price: Low to High</MenuItem>
-          <MenuItem value={-1}>Price: High to Low</MenuItem>
-        </Select>
-      </FormControl>
-      {data &&
-        data.products.products.map((product, index) => (
-          <div key={index}>
-            <div className={classes.productDiv}>
-              <img
-                src={product.imageUrl!}
-                alt={product.name}
-                className={classes.productImg}
-              />
-              <Typography
-                variant="body1"
-                component={Link}
-                to={`/products/${product.id}`}
-                className={classes.link}
-              >
-                {product.name}
-              </Typography>
-              <Typography variant="body1">
-                {product.price} {product.currency}
-              </Typography>
+    <>
+      <Container>
+        <FormControl className={classes.formControl}>
+          <InputLabel>Sort By</InputLabel>
+          <Select
+            value={order ? order : ""}
+            onChange={(e) => setOrder(e.target.value as number)}
+          >
+            <MenuItem value={1}>Price: Low to High</MenuItem>
+            <MenuItem value={-1}>Price: High to Low</MenuItem>
+          </Select>
+        </FormControl>
+        {data &&
+          data.products.products.map((product, index) => (
+            <div key={index}>
+              <div className={classes.productDiv}>
+                <img
+                  src={product.imageUrl!}
+                  alt={product.name}
+                  className={classes.productImg}
+                />
+                <Typography
+                  variant="body1"
+                  component={Link}
+                  to={`/products/${product.id}`}
+                  className={classes.link}
+                >
+                  {product.name}
+                </Typography>
+                <Typography variant="body1">
+                  {product.price} {product.currency}
+                </Typography>
+              </div>
+              <div className={classes.divider}>
+                {" "}
+                <Divider />
+              </div>
             </div>
-            <div className={classes.divider}>
-              {" "}
-              <Divider />
-            </div>
-          </div>
-        ))}
-      <br />
+          ))}
+        <br />
+      </Container>
       {data && (
         <div className={classes.pagination}>
           <Pagination
@@ -146,7 +147,7 @@ const Category: React.FC = () => {
           />
         </div>
       )}
-    </Container>
+    </>
   );
 };
 
