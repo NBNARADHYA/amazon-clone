@@ -8,11 +8,16 @@ import {
   Typography,
 } from "@material-ui/core";
 import { NavigateNext } from "@material-ui/icons";
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { Link, RouteComponentProps, useParams } from "react-router-dom";
 import AccessTokenContext from "../Context/AccessToken";
-import CartContext from "../Context/Cart";
-import { useAddToCartMutation, useProductQuery } from "../generated/graphql";
+import {
+  CartDocument,
+  CartQuery,
+  useAddToCartMutation,
+  useCartQuery,
+  useProductQuery,
+} from "../generated/graphql";
 
 const useStyles = makeStyles(() => ({
   prodContainer: {
@@ -57,13 +62,20 @@ const useStyles = makeStyles(() => ({
 
 const Product: React.FC<RouteComponentProps> = ({ history }) => {
   const classes = useStyles();
-
   const { id } = useParams<{ id: string }>();
 
-  const { cart, setCart } = useContext(CartContext)!;
+  const { data: cartQueryData, loading: cartLoading } = useCartQuery();
+  const { data, loading, error } = useProductQuery({ variables: { id } });
+
   const { accessToken } = useContext(AccessTokenContext)!;
 
-  const { data, loading, error } = useProductQuery({ variables: { id } });
+  const isPresentInCart = useMemo<boolean | null | undefined>(() => {
+    if (data && cartQueryData) {
+      return Boolean(
+        cartQueryData.cart.find((ele) => ele.product.id === data.product.id)
+      );
+    }
+  }, [data, cartQueryData]);
 
   const [addToCart] = useAddToCartMutation();
 
@@ -71,11 +83,11 @@ const Product: React.FC<RouteComponentProps> = ({ history }) => {
     console.log(error);
   }
 
-  if (loading) {
+  if (loading || cartLoading) {
     return <CircularProgress color="secondary" className={classes.spinner} />;
   }
 
-  if (data) {
+  if (data && cartQueryData) {
     const cat = data.product.category.split(">");
 
     if (!data.product.price) {
@@ -124,7 +136,7 @@ const Product: React.FC<RouteComponentProps> = ({ history }) => {
                     history.push("/login");
                     return;
                   }
-                  if (cart[data.product.id]) return;
+                  if (isPresentInCart) return;
                   try {
                     await addToCart({
                       variables: {
@@ -133,11 +145,33 @@ const Product: React.FC<RouteComponentProps> = ({ history }) => {
                           priceForOne: data.product.price!,
                         },
                       },
-                    });
-                    setCart((prev) => {
-                      const newCart = { ...prev };
-                      newCart[data.product.id] = true;
-                      return newCart;
+                      update: (cache, addToCartData) => {
+                        if (addToCartData.errors) {
+                          return;
+                        }
+                        const cartData = cache.readQuery<CartQuery>({
+                          query: CartDocument,
+                        });
+
+                        cache.writeQuery<CartQuery>({
+                          query: CartDocument,
+                          data: {
+                            cart: [
+                              ...cartData!.cart,
+                              {
+                                nos: addToCartData.data!.addToCart.nos!,
+                                product: {
+                                  id: data.product.id,
+                                  name: data.product.name,
+                                  currency: data.product.currency,
+                                  imageUrl: data.product.imageUrl,
+                                  price: data.product.price,
+                                },
+                              },
+                            ],
+                          },
+                        });
+                      },
                     });
                   } catch (error) {
                     console.log(error);
@@ -146,7 +180,7 @@ const Product: React.FC<RouteComponentProps> = ({ history }) => {
               >
                 {!accessToken
                   ? "Login to add to cart"
-                  : !cart[data.product.id]
+                  : !isPresentInCart
                   ? "Add to Cart"
                   : "Checkout cart"}
               </Button>

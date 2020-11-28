@@ -4,10 +4,17 @@ import {
   Divider,
   makeStyles,
   Typography,
+  IconButton,
 } from "@material-ui/core";
+import { Add, Remove } from "@material-ui/icons";
 import React from "react";
 import { Link } from "react-router-dom";
-import { useCartQuery } from "../generated/graphql";
+import {
+  CartDocument,
+  CartQuery,
+  useCartQuery,
+  useUpdateCartMutation,
+} from "../generated/graphql";
 
 const useStyles = makeStyles(() => ({
   spinner: {
@@ -30,14 +37,28 @@ const useStyles = makeStyles(() => ({
     marginTop: "10px",
     marginBottom: "20px",
   },
+  price: {
+    float: "left",
+  },
+  addRemove: {
+    float: "right",
+  },
+  body: {
+    marginTop: "30px",
+  },
+  nos: {
+    marginLeft: "5px",
+    marginRight: "5px",
+    fontSize: "18px",
+  },
 }));
 
 const Cart: React.FC = () => {
   const classes = useStyles();
 
-  const { data, loading, error } = useCartQuery({
-    fetchPolicy: "network-only",
-  });
+  const { data, loading, error } = useCartQuery();
+
+  const [updateCart] = useUpdateCartMutation();
 
   if (loading || !data) {
     return <CircularProgress className={classes.spinner} color="secondary" />;
@@ -65,12 +86,113 @@ const Cart: React.FC = () => {
             >
               {product.name}
             </Typography>
-            <Typography variant="body1">
-              {product.price} {product.currency}
-            </Typography>
+            <div className={classes.body}>
+              <Typography variant="body1" className={classes.price}>
+                {product.price} {product.currency}
+              </Typography>
+              <div className={classes.addRemove}>
+                <IconButton
+                  size="medium"
+                  onClick={async () => {
+                    try {
+                      await updateCart({
+                        variables: {
+                          cart: {
+                            nos: nos - 1,
+                            productId: product.id,
+                          },
+                        },
+                        update: (cache, updateCartData) => {
+                          if (updateCartData.errors) {
+                            return;
+                          }
+                          const cartIdx = data.cart.findIndex(
+                            (ele) => ele.product.id === product.id
+                          );
+
+                          let newCart = [...data.cart.slice(0, cartIdx)];
+                          if (nos > 1) {
+                            const newCartProd = {
+                              ...data.cart[cartIdx],
+                              nos: nos - 1,
+                            };
+                            newCart = [...newCart, newCartProd];
+                          }
+                          newCart = [
+                            ...newCart,
+                            ...data.cart.slice(cartIdx + 1),
+                          ];
+
+                          cache.writeQuery<CartQuery>({
+                            query: CartDocument,
+                            data: {
+                              cart: newCart,
+                            },
+                          });
+                        },
+                      });
+                    } catch (error) {
+                      console.error(error);
+                    }
+                  }}
+                >
+                  <Remove color="secondary" />
+                </IconButton>
+                <Typography
+                  variant="button"
+                  color="primary"
+                  className={classes.nos}
+                >
+                  {nos}
+                </Typography>
+                <IconButton
+                  disabled={nos > 4}
+                  size="medium"
+                  onClick={async () => {
+                    try {
+                      await updateCart({
+                        variables: {
+                          cart: {
+                            nos: nos + 1,
+                            productId: product.id,
+                          },
+                        },
+                        update: (cache, updateCartData) => {
+                          if (updateCartData.errors) {
+                            return;
+                          }
+                          const cartIdx = data.cart.findIndex(
+                            (ele) => ele.product.id === product.id
+                          );
+
+                          const newCartProd = {
+                            ...data.cart[cartIdx],
+                            nos: nos + 1,
+                          };
+
+                          cache.writeQuery<CartQuery>({
+                            query: CartDocument,
+                            data: {
+                              cart: [
+                                ...data.cart.slice(0, cartIdx),
+                                newCartProd,
+                                ...data.cart.slice(cartIdx + 1),
+                              ],
+                            },
+                          });
+                        },
+                      });
+                    } catch (error) {
+                      console.error(error);
+                    }
+                  }}
+                >
+                  <Add color="secondary" />
+                </IconButton>
+              </div>
+            </div>
           </div>
           <div className={classes.divider}>
-            {" "}
             <Divider />
           </div>
         </div>
