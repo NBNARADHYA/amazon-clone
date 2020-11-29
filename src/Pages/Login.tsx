@@ -2,14 +2,17 @@ import {
   Button,
   Container,
   makeStyles,
+  Snackbar,
   TextField,
   Typography,
 } from "@material-ui/core";
-import { Field, Form, Formik } from "formik";
-import React, { useContext } from "react";
+import { Alert } from "@material-ui/lab";
+import { ErrorMessage, Field, Form, Formik } from "formik";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
 import AccessTokenContext from "../Context/AccessToken";
 import { useLoginMutation } from "../generated/graphql";
+import { ErrorAlert } from "./SignUp";
 
 const useStyles = makeStyles(() => ({
   formContainer: {
@@ -45,10 +48,13 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
 
   const [login, { error }] = useLoginMutation({ fetchPolicy: "no-cache" });
 
-  if (error) {
-    return <div>{JSON.stringify(error, null, 2)}</div>;
-  }
+  const [errOpen, setErrOpen] = useState<boolean>(false);
 
+  useEffect(() => {
+    if (error) {
+      setErrOpen(true);
+    }
+  }, [error]);
   return (
     <Container className={classes.formContainer}>
       <Typography
@@ -61,18 +67,27 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
 
       <Formik
         initialValues={initialValues}
-        onSubmit={async ({ email, password }, { setSubmitting }) => {
-          try {
-            const response = await login({ variables: { email, password } });
-            setAccessToken(response.data!.login.accessToken);
-            localStorage.setItem(
-              "accessToken",
-              response.data!.login.accessToken
-            );
-          } finally {
-            setSubmitting(false);
-            history.push("/");
+        validate={(values) => {
+          const errors: Partial<LoginInput> = {};
+          if (!values.email) {
+            errors.email = "Email required";
+          } else if (
+            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
+          ) {
+            errors.email = "Invalid email address";
           }
+
+          if (!values.password) {
+            errors.password = "Password required";
+          }
+          return errors;
+        }}
+        onSubmit={async ({ email, password }, { setSubmitting }) => {
+          const response = await login({ variables: { email, password } });
+          setAccessToken(response.data!.login.accessToken);
+          localStorage.setItem("accessToken", response.data!.login.accessToken);
+          setSubmitting(false);
+          history.push("/");
         }}
       >
         {({ isSubmitting }) => (
@@ -85,6 +100,7 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
               variant="outlined"
               fullWidth
             />
+            <ErrorMessage name="email" component={ErrorAlert} />
             <br />
             <br />
             <Field
@@ -95,6 +111,8 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
               variant="outlined"
               fullWidth
             />
+            <ErrorMessage name="password" component={ErrorAlert} />
+
             <br />
             <Typography
               variant="overline"
@@ -115,6 +133,16 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
             >
               Login
             </Button>
+            <Snackbar
+              open={errOpen}
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              autoHideDuration={6000}
+              onClose={() => setErrOpen(false)}
+            >
+              <Alert onClose={() => setErrOpen(false)} severity="error">
+                {error && error.message}
+              </Alert>
+            </Snackbar>
           </Form>
         )}
       </Formik>

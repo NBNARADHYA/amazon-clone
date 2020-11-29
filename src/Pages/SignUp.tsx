@@ -2,11 +2,13 @@ import {
   Button,
   Container,
   makeStyles,
+  Snackbar,
   TextField,
   Typography,
 } from "@material-ui/core";
-import { Field, Form, Formik } from "formik";
-import React from "react";
+import { Alert } from "@material-ui/lab";
+import { ErrorMessage, Field, Form, Formik } from "formik";
+import React, { useEffect, useState } from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
 import { SignUpInputType, useSignUpMutation } from "../generated/graphql";
 
@@ -27,6 +29,10 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+export const ErrorAlert: React.FC = ({ children }) => {
+  return <Alert severity="error">{children}</Alert>;
+};
+
 const SignUp: React.FC<RouteComponentProps> = ({ history }) => {
   const initialValues: SignUpInputType = {
     email: "",
@@ -38,10 +44,13 @@ const SignUp: React.FC<RouteComponentProps> = ({ history }) => {
   const classes = useStyles();
 
   const [signUp, { error }] = useSignUpMutation({ fetchPolicy: "no-cache" });
+  const [errOpen, setErrOpen] = useState<boolean>(false);
 
-  if (error) {
-    return <div>{JSON.stringify(error, null, 2)}</div>;
-  }
+  useEffect(() => {
+    if (error) {
+      setErrOpen(true);
+    }
+  }, [error]);
 
   return (
     <Container className={classes.formContainer}>
@@ -55,6 +64,27 @@ const SignUp: React.FC<RouteComponentProps> = ({ history }) => {
 
       <Formik
         initialValues={initialValues}
+        validate={(values) => {
+          const errors: Partial<SignUpInputType> = {};
+          if (!values.email) {
+            errors.email = "Email required";
+          } else if (
+            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
+          ) {
+            errors.email = "Invalid email address";
+          }
+
+          if (!values.password) {
+            errors.password = "Password required";
+          } else if (values.password.length < 5) {
+            errors.password = "Must consist of min. 5 chars";
+          }
+
+          if (!values.firstName) {
+            errors.firstName = "First name required";
+          }
+          return errors;
+        }}
         onSubmit={async (values, { setSubmitting }) => {
           try {
             await signUp({ variables: { user: values } });
@@ -73,6 +103,7 @@ const SignUp: React.FC<RouteComponentProps> = ({ history }) => {
               variant="outlined"
               fullWidth
             />
+            <ErrorMessage name="firstName" component={ErrorAlert} />
             <br />
             <br />
             <Field
@@ -86,12 +117,12 @@ const SignUp: React.FC<RouteComponentProps> = ({ history }) => {
             <br />
             <Field
               name="email"
-              type="email"
               as={TextField}
               label="Email"
               variant="outlined"
               fullWidth
             />
+            <ErrorMessage name="email" component={ErrorAlert} />
             <br />
             <br />
             <Field
@@ -102,6 +133,7 @@ const SignUp: React.FC<RouteComponentProps> = ({ history }) => {
               variant="outlined"
               fullWidth
             />
+            <ErrorMessage name="password" component={ErrorAlert} />
             <br />
             <Typography
               variant="overline"
@@ -122,6 +154,16 @@ const SignUp: React.FC<RouteComponentProps> = ({ history }) => {
             >
               Sign Up
             </Button>
+            <Snackbar
+              open={errOpen}
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              autoHideDuration={6000}
+              onClose={() => setErrOpen(false)}
+            >
+              <Alert onClose={() => setErrOpen(false)} severity="error">
+                {error && error.message}
+              </Alert>
+            </Snackbar>
           </Form>
         )}
       </Formik>
