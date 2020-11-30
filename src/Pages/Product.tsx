@@ -83,7 +83,7 @@ const Product: React.FC<RouteComponentProps> = ({ history }) => {
     console.log(error);
   }
 
-  if (loading || cartLoading) {
+  if (loading || cartLoading || !data || !cartQueryData) {
     return <CircularProgress color="secondary" className={classes.spinner} />;
   }
 
@@ -136,12 +136,15 @@ const Product: React.FC<RouteComponentProps> = ({ history }) => {
                     history.push("/login");
                     return;
                   }
-                  if (isPresentInCart) return;
+                  if (isPresentInCart) {
+                    history.push("/checkout");
+                    return;
+                  }
                   try {
                     await addToCart({
                       variables: {
                         cart: {
-                          productId: data.product.id,
+                          product: data.product.id,
                           priceForOne: data.product.price!,
                         },
                       },

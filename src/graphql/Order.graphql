@@ -1,0 +1,27 @@
+mutation CreateOrder($data: CreateOrderInput!) {
+  createOrder(data: $data)
+}
+
+mutation UpdateOrder($id: Int!, $nos: Int!, $product: String!) {
+  updateOrder(id: $id, nos: $nos, product: $product)
+}
+
+mutation CancelOrder($id: Int!) {
+  cancelOrder(id: $id)
+}
+
+query Orders {
+  orders {
+    id
+    country
+    state
+    pincode
+    city
+    address
+    products {
+      productId
+      priceForOne
+      nos
+    }
+  }
+}

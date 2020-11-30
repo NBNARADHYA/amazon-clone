@@ -91,7 +91,7 @@ const Category: React.FC = () => {
     console.log(error);
   }
 
-  if (loading) {
+  if (loading || !data) {
     return <CircularProgress color="secondary" className={classes.spinner} />;
   }
 

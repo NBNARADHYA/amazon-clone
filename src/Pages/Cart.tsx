@@ -5,6 +5,7 @@ import {
   makeStyles,
   Typography,
   IconButton,
+  Button,
 } from "@material-ui/core";
 import { Add, Remove } from "@material-ui/icons";
 import React from "react";
@@ -51,6 +52,18 @@ const useStyles = makeStyles(() => ({
     marginRight: "5px",
     fontSize: "18px",
   },
+  header: {
+    marginTop: "20px",
+    marginBottom: "20px",
+    textAlign: "center",
+  },
+  checkoutBtn: {
+    textAlign: "center",
+  },
+  emptyCartHeader: {
+    marginTop: "25%",
+    textAlign: "center",
+  },
 }));
 
 const Cart: React.FC = () => {
@@ -68,8 +81,32 @@ const Cart: React.FC = () => {
     console.log(error);
     return null;
   }
+
+  if (!data.cart.length) {
+    return (
+      <Container>
+        <Typography
+          variant="h3"
+          color="secondary"
+          gutterBottom
+          className={classes.emptyCartHeader}
+        >
+          Your Cart is empty !
+        </Typography>
+      </Container>
+    );
+  }
   return (
     <Container>
+      <Typography
+        variant="h4"
+        color="secondary"
+        gutterBottom
+        className={classes.header}
+      >
+        My Cart
+      </Typography>
+      <Divider className={classes.divider} />
       {data.cart.map(({ nos, product }, index) => (
         <div key={index}>
           <div className={classes.productDiv}>
@@ -99,7 +136,7 @@ const Cart: React.FC = () => {
                         variables: {
                           cart: {
                             nos: nos - 1,
-                            productId: product.id,
+                            product: product.id,
                           },
                         },
                         update: (cache, updateCartData) => {
@@ -154,7 +191,7 @@ const Cart: React.FC = () => {
                         variables: {
                           cart: {
                             nos: nos + 1,
-                            productId: product.id,
+                            product: product.id,
                           },
                         },
                         update: (cache, updateCartData) => {
@@ -197,6 +234,18 @@ const Cart: React.FC = () => {
           </div>
         </div>
       ))}
+      <br />
+      <div className={classes.checkoutBtn}>
+        <Button
+          component={Link}
+          to="/checkout?cart=true"
+          color="secondary"
+          size="large"
+          variant="contained"
+        >
+          Checkout Cart
+        </Button>
+      </div>
     </Container>
   );
 };
