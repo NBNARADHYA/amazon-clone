@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
   AppBar,
-  Button,
   IconButton,
   InputBase,
   Toolbar,
@@ -14,10 +13,9 @@ import {
 } from "@material-ui/icons";
 import DrawerContext from "../../Context/Drawer";
 import SearchInCategoryContext from "../../Context/SearchInCategory";
-import CategoriesDrawer from "./CategoriesDrawer";
-import { Link, useHistory, useLocation } from "react-router-dom";
+import Menu from "./Menu";
+import { Link, useLocation } from "react-router-dom";
 import AccessTokenContext from "../../Context/AccessToken";
-import { useLogoutMutation } from "../../generated/graphql";
 import CartIcon from "@material-ui/icons/ShoppingCartSharp";
 
 const useStyles = makeStyles((theme) => ({
@@ -54,15 +52,11 @@ const useStyles = makeStyles((theme) => ({
   searchForm: {
     width: "70%",
   },
-  signUpBtn: {
-    position: "absolute",
-    right: "15px",
-  },
   cart: {
     color: "white",
     fontSize: "large",
-    marginLeft: "170px",
-    marginRight: "10px",
+    position: "absolute",
+    right: "15px",
   },
 }));
 
@@ -73,7 +67,6 @@ const Navbar: React.FC = () => {
   const [searchString, setSearchString] = useState("");
   const classes = useStyles();
 
-  const history = useHistory();
   const location = useLocation();
 
   const { accessToken, setAccessToken } = useContext(AccessTokenContext)!;
@@ -84,8 +77,6 @@ const Navbar: React.FC = () => {
       setAccessToken(localAccessToken);
     }
   });
-
-  const [logout] = useLogoutMutation({ fetchPolicy: "no-cache" });
 
   const pathArray = location.pathname.split("/");
 
@@ -101,7 +92,7 @@ const Navbar: React.FC = () => {
 
   return (
     <AppBar className={classes.appBar}>
-      <CategoriesDrawer />
+      <Menu />
       <Toolbar>
         <IconButton edge="start" onClick={() => setDrawerState(-1)}>
           <MenuIcon className={classes.menuIcon} />
@@ -142,24 +133,6 @@ const Navbar: React.FC = () => {
           <IconButton className={classes.cart} component={Link} to="/cart">
             <CartIcon />
           </IconButton>
-        )}
-
-        {pathArray[1] !== "login" && pathArray[1] !== "signup" && (
-          <Button
-            variant="contained"
-            className={classes.signUpBtn}
-            size="medium"
-            onClick={async () => {
-              if (accessToken) {
-                await logout();
-                localStorage.removeItem("accessToken");
-                setAccessToken(null);
-              }
-              history.push("/login");
-            }}
-          >
-            {accessToken ? "Logout" : "Login or signup"}
-          </Button>
         )}
       </Toolbar>
     </AppBar>

@@ -1,21 +1,38 @@
 import {
+  Button,
   Divider,
   Drawer,
   IconButton,
   List,
   ListItem,
   ListItemText,
+  makeStyles,
   Typography,
 } from "@material-ui/core";
 import React, { useMemo, useContext } from "react";
 import { ArrowBackRounded } from "@material-ui/icons";
 import categories from "../../Data/productCategoriesArr.json";
 import DrawerContext from "../../Context/Drawer";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
+import { useLogoutMutation } from "../../generated/graphql";
+import AccessTokenContext from "../../Context/AccessToken";
 
-const CategoriesDrawer: React.FC = () => {
+const useStyles = makeStyles(() => ({
+  signUpBtn: {
+    marginBottom: "15px",
+  },
+}));
+
+const Menu: React.FC = () => {
   const { drawerState, setDrawerState } = useContext(DrawerContext)!;
   const history = useHistory();
+  const location = useLocation();
+  const [logout] = useLogoutMutation({ fetchPolicy: "no-cache" });
+  const { accessToken, setAccessToken } = useContext(AccessTokenContext)!;
+
+  const classes = useStyles();
+
+  const pathArray = location.pathname.split("/");
 
   const mainCatDrawer = useMemo(
     () => (
@@ -85,6 +102,24 @@ const CategoriesDrawer: React.FC = () => {
       open={drawerState !== null}
       onClose={() => setDrawerState(null)}
     >
+      {pathArray[1] !== "login" && pathArray[1] !== "signup" && (
+        <Button
+          className={classes.signUpBtn}
+          color="secondary"
+          size="large"
+          onClick={async () => {
+            if (accessToken) {
+              await logout();
+              localStorage.removeItem("accessToken");
+              setAccessToken(null);
+            }
+            setDrawerState(null);
+            history.push("/login");
+          }}
+        >
+          {accessToken ? "Logout" : "Login or signup"}
+        </Button>
+      )}
       {drawerState === -1
         ? mainCatDrawer
         : drawerState !== null && subCatDrawers[drawerState]}
@@ -92,4 +127,4 @@ const CategoriesDrawer: React.FC = () => {
   );
 };
 
-export default CategoriesDrawer;
+export default Menu;
