@@ -1,6 +1,6 @@
 import { HttpLink as HTTPLINK } from "@apollo/client";
 
 export const HttpLink = new HTTPLINK({
-  uri: "http://localhost:5000/graphql",
+  uri: `${process.env.REACT_APP_SERVER_HOST}/graphql`,
   credentials: "include",
 });

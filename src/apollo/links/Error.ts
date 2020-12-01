@@ -8,7 +8,7 @@ export const ErrorLink = onError(
           `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
         );
         if (message.includes("NOT_AUTHORIZED")) {
-          window.location.href = "https://localhost:3000/login";
+          window.location.href = `${process.env.REACT_APP_CLIENT_HOST}/login`;
         }
       });
 

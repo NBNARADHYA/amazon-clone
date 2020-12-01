@@ -86,6 +86,7 @@ const Product: React.FC<RouteComponentProps> = ({ history }) => {
 
   if (error) {
     console.log(error);
+    return null;
   }
 
   if (loading || cartLoading || !data || !cartQueryData) {
@@ -224,8 +225,7 @@ const Product: React.FC<RouteComponentProps> = ({ history }) => {
       </Container>
     );
   }
-
-  return <div>Error...</div>;
+  return null;
 };
 
 export default Product;

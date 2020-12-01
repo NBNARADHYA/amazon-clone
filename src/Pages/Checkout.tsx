@@ -89,6 +89,10 @@ const useStyles = makeStyles(() => ({
     left: "50%",
     marginLeft: "-4em",
   },
+  successAlert: {
+    marginTop: "10%",
+    textAlign: "center",
+  },
 }));
 
 interface CheckoutFields {
@@ -160,25 +164,17 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
 
   if (success) {
     return (
-      <Snackbar
-        open={success}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        autoHideDuration={7000}
-        onClose={() => {
-          setSuccess(false);
-          history.push("/");
-        }}
-      >
+      <Container className={classes.successAlert}>
         <Alert
           onClose={() => {
             setSuccess(false);
-            history.push("/");
+            history.push("/orders");
           }}
           severity="success"
         >
-          Your order was places successfully
+          Your order was placed successfully
         </Alert>
-      </Snackbar>
+      </Container>
     );
   }
 

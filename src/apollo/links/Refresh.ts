@@ -17,7 +17,7 @@ export const RefreshLink = new TokenRefreshLink({
     }
   },
   fetchAccessToken: () => {
-    return fetch("http://localhost:5000/refresh_token", {
+    return fetch(`${process.env.REACT_APP_SERVER_HOST}/refresh_token`, {
       method: "POST",
       credentials: "include",
     });
@@ -28,6 +28,6 @@ export const RefreshLink = new TokenRefreshLink({
   handleError: () => {
     console.warn("Your refresh token is invalid. Try to relogin");
     localStorage.removeItem("accessToken");
-    window.location.href = "http://localhost:3000/login";
+    window.location.href = `${process.env.REACT_APP_CLIENT_HOST}/login`;
   },
 });
