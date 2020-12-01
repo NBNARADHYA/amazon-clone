@@ -58,6 +58,11 @@ const useStyles = makeStyles(() => ({
     clear: "inline-end",
     overflow: "auto",
   },
+  buyNow: {
+    float: "right",
+    marginBottom: "20px",
+    clear: "right",
+  },
 }));
 
 const Product: React.FC<RouteComponentProps> = ({ history }) => {
@@ -137,7 +142,7 @@ const Product: React.FC<RouteComponentProps> = ({ history }) => {
                     return;
                   }
                   if (isPresentInCart) {
-                    history.push("/checkout");
+                    history.push("/checkout?cart=true");
                     return;
                   }
                   try {
@@ -145,7 +150,6 @@ const Product: React.FC<RouteComponentProps> = ({ history }) => {
                       variables: {
                         cart: {
                           product: data.product.id,
-                          priceForOne: data.product.price!,
                         },
                       },
                       update: (cache, addToCartData) => {
@@ -186,6 +190,16 @@ const Product: React.FC<RouteComponentProps> = ({ history }) => {
                   : !isPresentInCart
                   ? "Add to Cart"
                   : "Checkout cart"}
+              </Button>
+            </div>
+            <div className={classes.buyNow}>
+              <Button
+                variant="contained"
+                color="secondary"
+                component={Link}
+                to={`/checkout?cart=false&id=${data.product.id}`}
+              >
+                Buy Now
               </Button>
             </div>
           </div>

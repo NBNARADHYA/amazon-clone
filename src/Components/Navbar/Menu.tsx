@@ -13,12 +13,13 @@ import React, { useMemo, useContext } from "react";
 import { ArrowBackRounded } from "@material-ui/icons";
 import categories from "../../Data/productCategoriesArr.json";
 import DrawerContext from "../../Context/Drawer";
-import { useHistory, useLocation } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { useLogoutMutation } from "../../generated/graphql";
 import AccessTokenContext from "../../Context/AccessToken";
 
 const useStyles = makeStyles(() => ({
-  signUpBtn: {
+  signUpBtn: {},
+  userActions: {
     marginBottom: "15px",
   },
 }));
@@ -120,6 +121,25 @@ const Menu: React.FC = () => {
           {accessToken ? "Logout" : "Login or signup"}
         </Button>
       )}
+      {accessToken && (
+        <Button
+          onClick={() => setDrawerState(null)}
+          component={Link}
+          to="/cart"
+        >
+          My Cart
+        </Button>
+      )}
+      {accessToken && (
+        <Button
+          onClick={() => setDrawerState(null)}
+          component={Link}
+          to="/orders"
+        >
+          My Orders
+        </Button>
+      )}
+      <Divider />
       {drawerState === -1
         ? mainCatDrawer
         : drawerState !== null && subCatDrawers[drawerState]}

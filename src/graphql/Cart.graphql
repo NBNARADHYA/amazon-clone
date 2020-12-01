@@ -4,7 +4,6 @@ mutation AddToCart($cart: ProductInput!) {
     email
     product
     nos
-    priceForOne
   }
 }
 

@@ -61,7 +61,8 @@ export type Product = {
 
 export type Order = {
   __typename?: 'Order';
-  id: Scalars['ID'];
+  id: Scalars['Int'];
+  createdAt: Scalars['Float'];
   address: Scalars['String'];
   country: Scalars['String'];
   state: Scalars['String'];
@@ -73,8 +74,7 @@ export type Order = {
 export type OrderContent = {
   __typename?: 'OrderContent';
   id: Scalars['ID'];
-  productId: Scalars['String'];
-  priceForOne: Scalars['String'];
+  product: Product;
   nos: Scalars['Int'];
 };
 
@@ -91,7 +91,7 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   addToCart: Cart;
   updateCart: Scalars['Boolean'];
-  createOrder: Scalars['Boolean'];
+  createOrder: CreateOrderOutput;
   cancelOrder: Scalars['Boolean'];
   updateOrder: Scalars['Boolean'];
 };
@@ -163,18 +163,22 @@ export type Cart = {
   email: Scalars['String'];
   product: Scalars['String'];
   nos?: Maybe<Scalars['Int']>;
-  priceForOne: Scalars['String'];
 };
 
 export type ProductInput = {
   product: Scalars['String'];
   nos?: Maybe<Scalars['Int']>;
-  priceForOne: Scalars['String'];
 };
 
 export type UpdateCartInput = {
   product: Scalars['String'];
   nos: Scalars['Int'];
+};
+
+export type CreateOrderOutput = {
+  __typename?: 'CreateOrderOutput';
+  id: Scalars['Int'];
+  createdAt: Scalars['Float'];
 };
 
 export type CreateOrderInput = {
@@ -196,7 +200,7 @@ export type AddToCartMutation = (
   { __typename?: 'Mutation' }
   & { addToCart: (
     { __typename?: 'Cart' }
-    & Pick<Cart, 'id' | 'email' | 'product' | 'nos' | 'priceForOne'>
+    & Pick<Cart, 'id' | 'email' | 'product' | 'nos'>
   ) }
 );
 
@@ -232,7 +236,10 @@ export type CreateOrderMutationVariables = Exact<{
 
 export type CreateOrderMutation = (
   { __typename?: 'Mutation' }
-  & Pick<Mutation, 'createOrder'>
+  & { createOrder: (
+    { __typename?: 'CreateOrderOutput' }
+    & Pick<CreateOrderOutput, 'id' | 'createdAt'>
+  ) }
 );
 
 export type UpdateOrderMutationVariables = Exact<{
@@ -264,10 +271,14 @@ export type OrdersQuery = (
   { __typename?: 'Query' }
   & { orders: Array<(
     { __typename?: 'Order' }
-    & Pick<Order, 'id' | 'country' | 'state' | 'pincode' | 'city' | 'address'>
+    & Pick<Order, 'id' | 'createdAt' | 'country' | 'state' | 'pincode' | 'city' | 'address'>
     & { products: Array<(
       { __typename?: 'OrderContent' }
-      & Pick<OrderContent, 'productId' | 'priceForOne' | 'nos'>
+      & Pick<OrderContent, 'nos'>
+      & { product: (
+        { __typename?: 'Product' }
+        & Pick<Product, 'id' | 'name' | 'price' | 'currency' | 'imageUrl'>
+      ) }
     )> }
   )> }
 );
@@ -349,7 +360,6 @@ export const AddToCartDocument = gql`
     email
     product
     nos
-    priceForOne
   }
 }
     `;
@@ -449,7 +459,10 @@ export type CartLazyQueryHookResult = ReturnType<typeof useCartLazyQuery>;
 export type CartQueryResult = Apollo.QueryResult<CartQuery, CartQueryVariables>;
 export const CreateOrderDocument = gql`
     mutation CreateOrder($data: CreateOrderInput!) {
-  createOrder(data: $data)
+  createOrder(data: $data) {
+    id
+    createdAt
+  }
 }
     `;
 export type CreateOrderMutationFn = Apollo.MutationFunction<CreateOrderMutation, CreateOrderMutationVariables>;
@@ -543,14 +556,20 @@ export const OrdersDocument = gql`
     query Orders {
   orders {
     id
+    createdAt
     country
     state
     pincode
     city
     address
     products {
-      productId
-      priceForOne
+      product {
+        id
+        name
+        price
+        currency
+        imageUrl
+      }
       nos
     }
   }

@@ -1,5 +1,8 @@
 mutation CreateOrder($data: CreateOrderInput!) {
-  createOrder(data: $data)
+  createOrder(data: $data) {
+    id
+    createdAt
+  }
 }
 
 mutation UpdateOrder($id: Int!, $nos: Int!, $product: String!) {
@@ -13,14 +16,20 @@ mutation CancelOrder($id: Int!) {
 query Orders {
   orders {
     id
+    createdAt
     country
     state
     pincode
     city
     address
     products {
-      productId
-      priceForOne
+      product {
+        id
+        name
+        price
+        currency
+        imageUrl
+      }
       nos
     }
   }

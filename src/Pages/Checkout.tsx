@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
 import queryString from "query-string";
 import {
   CartDocument,
   CartQuery,
-  useCartQuery,
+  OrderContent,
+  OrdersDocument,
+  OrdersQuery,
+  Product,
+  useCartLazyQuery,
   useCreateOrderMutation,
+  useProductLazyQuery,
 } from "../generated/graphql";
 import {
   Button,
@@ -95,9 +100,29 @@ interface CheckoutFields {
   city: string;
 }
 
+type OrdersQueryProductsType = Array<
+  { __typename?: "OrderContent" } & Pick<OrderContent, "nos"> & {
+      product: { __typename?: "Product" } & Pick<
+        Product,
+        "id" | "name" | "price" | "currency" | "imageUrl"
+      >;
+    }
+>;
+
 const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
+  const query = useMemo(() => queryString.parse(location.search), [
+    location.search,
+  ]);
+
+  if (query["cart"] !== "true" && query["cart"] !== "false") {
+    history.push("/");
+  }
   const classes = useStyles();
-  const { data, loading, error: cartError } = useCartQuery();
+  const [cartQuery, { data, loading, error: cartError }] = useCartLazyQuery();
+  const [
+    productQuery,
+    { data: prodData, loading: prodLoading, error: prodError },
+  ] = useProductLazyQuery();
   const [errOpen, setErrOpen] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
 
@@ -109,12 +134,27 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
     }
   }, [error]);
 
-  if (cartError) {
+  useEffect(() => {
+    if (query["cart"] === "true") {
+      cartQuery();
+    } else {
+      productQuery({
+        variables: {
+          id: query["id"] as string,
+        },
+      });
+    }
+  }, [cartQuery, query, productQuery]);
+
+  if (cartError || prodError) {
     console.error(error);
     return null;
   }
 
-  if (loading || !data) {
+  if (
+    (query["cart"] === "true" && (loading || !data)) ||
+    (query["cart"] === "false" && (prodLoading || !prodData))
+  ) {
     return <CircularProgress className={classes.spinner} color="secondary" />;
   }
 
@@ -142,8 +182,6 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
     );
   }
 
-  const query = queryString.parse(location.search);
-
   const initialValues: CheckoutFields = {
     address1: "",
     address2: "",
@@ -153,10 +191,26 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
     city: "",
   };
 
+  const currData =
+    query["cart"] === "true"
+      ? data!.cart
+      : [
+          {
+            nos: 1,
+            product: {
+              imageUrl: prodData!.product.imageUrl,
+              name: prodData!.product.name,
+              id: prodData!.product.id,
+              price: prodData!.product.price,
+              currency: prodData!.product.currency,
+            },
+          },
+        ];
+
   return (
     <>
       <Container className={classes.cartContainer}>
-        {data.cart.map(({ nos, product }, index) => (
+        {currData!.map(({ nos, product }, index) => (
           <div key={index}>
             <div className={classes.productDiv}>
               <img
@@ -210,14 +264,28 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
             { address1, address2, pincode, country, state, city },
             { setSubmitting }
           ) => {
+            let products: {
+              nos: number;
+              product: string;
+            }[];
+            if (query["cart"] === "false") {
+              if (!query["id"]) return;
+              products = [
+                {
+                  nos: 1,
+                  product: query["id"] as string,
+                },
+              ];
+            } else {
+              products = data!.cart.map(({ product, nos }) => ({
+                nos,
+                product: product.id,
+              }));
+            }
             await createOrder({
               variables: {
                 data: {
-                  products: data.cart.map(({ product, nos }) => ({
-                    priceForOne: product.price ? product.price : "200",
-                    nos,
-                    product: product.id,
-                  })),
+                  products,
                   checkout: query["cart"] === "true",
                   address: address1 + address2,
                   pincode,
@@ -226,16 +294,42 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
                   city,
                 },
               },
-              update: (cache, { errors }) => {
-                if (errors) {
+              update: (cache, { errors, data: createOrderData }) => {
+                if (errors || !createOrderData) {
                   return;
                 }
-                cache.writeQuery<CartQuery>({
-                  query: CartDocument,
-                  data: {
-                    cart: [],
-                  },
-                });
+                if (query["cart"] === "true") {
+                  cache.writeQuery<CartQuery>({
+                    query: CartDocument,
+                    data: {
+                      cart: [],
+                    },
+                  });
+                }
+
+                try {
+                  const currOrdersData = cache.readQuery<OrdersQuery>({
+                    query: OrdersDocument,
+                  });
+                  cache.writeQuery<OrdersQuery>({
+                    query: OrdersDocument,
+                    data: {
+                      orders: [
+                        ...currOrdersData!.orders,
+                        {
+                          address: address1 + address2,
+                          pincode,
+                          country,
+                          state,
+                          city,
+                          createdAt: createOrderData.createOrder.createdAt,
+                          id: createOrderData.createOrder.id,
+                          products: currData as OrdersQueryProductsType,
+                        },
+                      ],
+                    },
+                  });
+                } catch (error) {}
               },
             });
             setSuccess(true);
@@ -319,7 +413,7 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
                 onClose={() => setErrOpen(false)}
               >
                 <Alert onClose={() => setErrOpen(false)} severity="error">
-                  {/* {error && error.message} */}
+                  {error && error.message}
                 </Alert>
               </Snackbar>
             </Form>

@@ -8,8 +8,9 @@ import {
   Button,
 } from "@material-ui/core";
 import { Add, Remove } from "@material-ui/icons";
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import DrawerContext from "../Context/Drawer";
 import {
   CartDocument,
   CartQuery,
@@ -61,7 +62,7 @@ const useStyles = makeStyles(() => ({
     textAlign: "center",
   },
   emptyCartHeader: {
-    marginTop: "25%",
+    marginTop: "15%",
     textAlign: "center",
   },
 }));
@@ -72,6 +73,7 @@ const Cart: React.FC = () => {
   const { data, loading, error } = useCartQuery();
 
   const [updateCart] = useUpdateCartMutation();
+  const { setDrawerState } = useContext(DrawerContext)!;
 
   if (loading || !data) {
     return <CircularProgress className={classes.spinner} color="secondary" />;
@@ -93,6 +95,17 @@ const Cart: React.FC = () => {
         >
           Your Cart is empty !
         </Typography>
+        <div style={{ textAlign: "center" }}>
+          <Button
+            variant="contained"
+            style={{ marginTop: "100px" }}
+            onClick={() => setDrawerState(-1)}
+          >
+            <Typography variant="h2" color="textSecondary">
+              All Categories
+            </Typography>
+          </Button>
+        </div>
       </Container>
     );
   }
