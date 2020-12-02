@@ -18,8 +18,8 @@ import {
 
 const useStyles = makeStyles(() => ({
   spinner: {
-    left: "50%",
-    marginLeft: "-4em",
+    marginLeft: "47vw",
+    marginTop: "40vh",
   },
   productDiv: {
     overflow: "auto",
@@ -73,7 +73,7 @@ const Orders: React.FC = () => {
   const { data, loading, error } = useOrdersQuery();
   const classes = useStyles();
 
-  const [cancelOrder] = useCancelOrderMutation();
+  const [cancelOrder, { loading: cancelLoading }] = useCancelOrderMutation();
 
   if (error) {
     console.error(error);
@@ -81,7 +81,7 @@ const Orders: React.FC = () => {
   }
 
   if (loading || !data) {
-    return <CircularProgress className={classes.spinner} color="secondary" />;
+    return <CircularProgress className={classes.spinner} color="inherit" />;
   }
 
   return (
@@ -107,6 +107,7 @@ const Orders: React.FC = () => {
             {getDate(order.createdAt)}
           </Typography>
           <Button
+            disabled={cancelLoading}
             size="large"
             color="secondary"
             className={classes.cancelOrderBtn}

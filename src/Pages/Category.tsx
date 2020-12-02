@@ -48,8 +48,8 @@ const useStyles = makeStyles(() => ({
     marginLeft: "20px",
   },
   spinner: {
-    left: "50%",
-    marginLeft: "-4em",
+    marginLeft: "47vw",
+    marginTop: "40vh",
   },
 }));
 
@@ -88,11 +88,12 @@ const Category: React.FC = () => {
   }, [category, searchInCatString]);
 
   if (error) {
-    console.log(error);
+    console.error(error);
+    return null;
   }
 
   if (loading || !data) {
-    return <CircularProgress color="secondary" className={classes.spinner} />;
+    return <CircularProgress color="inherit" className={classes.spinner} />;
   }
 
   return (

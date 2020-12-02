@@ -86,8 +86,8 @@ const useStyles = makeStyles(() => ({
     textAlign: "center",
   },
   spinner: {
-    left: "50%",
-    marginLeft: "-4em",
+    marginLeft: "47vw",
+    marginTop: "40vh",
   },
   successAlert: {
     marginTop: "10%",
@@ -117,16 +117,13 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
   const query = useMemo(() => queryString.parse(location.search), [
     location.search,
   ]);
-
+  const isCart = query["cart"] === "true";
   if (query["cart"] !== "true" && query["cart"] !== "false") {
     history.push("/");
   }
   const classes = useStyles();
-  const [cartQuery, { data, loading, error: cartError }] = useCartLazyQuery();
-  const [
-    productQuery,
-    { data: prodData, loading: prodLoading, error: prodError },
-  ] = useProductLazyQuery();
+  const [cartQuery, cart] = useCartLazyQuery();
+  const [productQuery, product] = useProductLazyQuery();
   const [errOpen, setErrOpen] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
 
@@ -139,7 +136,7 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
   }, [error]);
 
   useEffect(() => {
-    if (query["cart"] === "true") {
+    if (isCart) {
       cartQuery();
     } else {
       productQuery({
@@ -148,18 +145,21 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
         },
       });
     }
-  }, [cartQuery, query, productQuery]);
+  }, [cartQuery, query, productQuery, isCart]);
 
-  if (cartError || prodError) {
-    console.error(error);
+  if (cart.error) {
+    console.error(cart.error);
     return null;
   }
-
+  if (product.error) {
+    console.error(product.error);
+    return null;
+  }
   if (
-    (query["cart"] === "true" && (loading || !data)) ||
-    (query["cart"] === "false" && (prodLoading || !prodData))
+    (isCart && (cart.loading || !cart.data)) ||
+    (!isCart && (product.loading || !product.data))
   ) {
-    return <CircularProgress className={classes.spinner} color="secondary" />;
+    return <CircularProgress className={classes.spinner} color="inherit" />;
   }
 
   if (success) {
@@ -187,21 +187,20 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
     city: "",
   };
 
-  const currData =
-    query["cart"] === "true"
-      ? data!.cart
-      : [
-          {
-            nos: 1,
-            product: {
-              imageUrl: prodData!.product.imageUrl,
-              name: prodData!.product.name,
-              id: prodData!.product.id,
-              price: prodData!.product.price,
-              currency: prodData!.product.currency,
-            },
+  const currData = isCart
+    ? cart.data!.cart
+    : [
+        {
+          nos: 1,
+          product: {
+            imageUrl: product.data!.product.imageUrl,
+            name: product.data!.product.name,
+            id: product.data!.product.id,
+            price: product.data!.product.price,
+            currency: product.data!.product.currency,
           },
-        ];
+        },
+      ];
 
   return (
     <>
@@ -264,7 +263,7 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
               nos: number;
               product: string;
             }[];
-            if (query["cart"] === "false") {
+            if (!isCart) {
               if (!query["id"]) return;
               products = [
                 {
@@ -273,7 +272,7 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
                 },
               ];
             } else {
-              products = data!.cart.map(({ product, nos }) => ({
+              products = cart.data!.cart.map(({ product, nos }) => ({
                 nos,
                 product: product.id,
               }));
@@ -282,7 +281,7 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
               variables: {
                 data: {
                   products,
-                  checkout: query["cart"] === "true",
+                  checkout: isCart,
                   address: address1 + address2,
                   pincode,
                   country,
@@ -294,7 +293,7 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
                 if (errors || !createOrderData) {
                   return;
                 }
-                if (query["cart"] === "true") {
+                if (isCart) {
                   cache.writeQuery<CartQuery>({
                     query: CartDocument,
                     data: {

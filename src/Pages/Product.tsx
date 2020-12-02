@@ -8,14 +8,14 @@ import {
   Typography,
 } from "@material-ui/core";
 import { NavigateNext } from "@material-ui/icons";
-import React, { useContext, useMemo } from "react";
+import React, { useContext, useEffect, useMemo } from "react";
 import { Link, RouteComponentProps, useParams } from "react-router-dom";
 import AccessTokenContext from "../Context/AccessToken";
 import {
   CartDocument,
   CartQuery,
   useAddToCartMutation,
-  useCartQuery,
+  useCartLazyQuery,
   useProductQuery,
 } from "../generated/graphql";
 
@@ -44,8 +44,8 @@ const useStyles = makeStyles(() => ({
     overflowWrap: "break-word",
   },
   spinner: {
-    left: "50%",
-    marginLeft: "-4em",
+    marginLeft: "47vw",
+    marginTop: "40vh",
   },
   subTitle: {
     float: "left",
@@ -67,165 +67,176 @@ const useStyles = makeStyles(() => ({
 
 const Product: React.FC<RouteComponentProps> = ({ history }) => {
   const classes = useStyles();
-  const { id } = useParams<{ id: string }>();
+  const { id: productId } = useParams<{ id: string }>();
 
-  const { data: cartQueryData, loading: cartLoading } = useCartQuery();
-  const { data, loading, error } = useProductQuery({ variables: { id } });
+  const [loadCart, cart] = useCartLazyQuery();
+  const product = useProductQuery({ variables: { id: productId } });
+  const [addToCart, { loading }] = useAddToCartMutation();
 
   const { accessToken } = useContext(AccessTokenContext)!;
+  useEffect(() => {
+    if (accessToken) {
+      loadCart();
+    }
+  }, [loadCart, accessToken]);
 
   const isPresentInCart = useMemo<boolean | null | undefined>(() => {
-    if (data && cartQueryData) {
+    if (product.data && cart.data) {
       return Boolean(
-        cartQueryData.cart.find((ele) => ele.product.id === data.product.id)
+        cart.data.cart.find(
+          (ele) => ele.product.id === product.data!.product.id
+        )
       );
     }
-  }, [data, cartQueryData]);
+  }, [product.data, cart.data]);
 
-  const [addToCart] = useAddToCartMutation();
-
-  if (error) {
-    console.log(error);
+  if (product.error) {
+    console.error(product.error);
     return null;
   }
 
-  if (loading || cartLoading || !data || !cartQueryData) {
-    return <CircularProgress color="secondary" className={classes.spinner} />;
+  if (
+    product.loading ||
+    !product.data ||
+    (accessToken && (cart.loading || !cart.data))
+  ) {
+    return <CircularProgress color="inherit" className={classes.spinner} />;
   }
 
-  if (data && cartQueryData) {
-    const cat = data.product.category.split(">");
+  if (!product.data.product.price) {
+    product.data.product.price = "200";
+  }
+  const {
+    id,
+    category,
+    currency,
+    imageUrl,
+    brand,
+    name,
+    contents,
+    price,
+    description,
+  } = product.data.product;
 
-    if (!data.product.price) {
-      data.product.price = "200";
-    }
+  const cat = category.split(">");
 
-    return (
-      <Container className={classes.prodContainer}>
-        <div className={classes.breadCrumb}>
-          <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
-            <Typography color="textSecondary">{cat[0]}</Typography>
-            <Link
-              to={`/categories/${data.product.category}`}
-              className={classes.breadCrumbLink}
-            >
-              {cat[1]}
-            </Link>
-          </Breadcrumbs>
-        </div>
-        <div>
-          <img
-            className={classes.prodImg}
-            src={data.product.imageUrl!}
-            alt={data.product.id}
-          />
-          <div className={classes.title}>
-            <Typography variant="h5" gutterBottom>
-              {data.product.name}
+  return (
+    <Container className={classes.prodContainer}>
+      <div className={classes.breadCrumb}>
+        <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
+          <Typography color="textSecondary">{cat[0]}</Typography>
+          <Link
+            to={`/categories/${category}`}
+            className={classes.breadCrumbLink}
+          >
+            {cat[1]}
+          </Link>
+        </Breadcrumbs>
+      </div>
+      <div>
+        <img className={classes.prodImg} src={imageUrl!} alt={id} />
+        <div className={classes.title}>
+          <Typography variant="h5" gutterBottom>
+            {name}
+          </Typography>
+          <div className={classes.subTitle}>
+            <Typography variant="body2" gutterBottom color="textSecondary">
+              Brand: {brand}
             </Typography>
-            <div className={classes.subTitle}>
-              <Typography variant="body2" gutterBottom color="textSecondary">
-                Brand: {data.product.brand}
-              </Typography>
-              <Typography color="textSecondary">Price:</Typography>
-              <Typography variant="body1" color="secondary">
-                {data.product.price} {data.product.currency}
-              </Typography>
-            </div>
-            <div className={classes.addToCart}>
-              <br />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={async () => {
-                  if (!accessToken) {
-                    history.push("/login");
-                    return;
-                  }
-                  if (isPresentInCart) {
-                    history.push("/checkout?cart=true");
-                    return;
-                  }
-                  try {
-                    await addToCart({
-                      variables: {
-                        cart: {
-                          product: data.product.id,
-                        },
-                      },
-                      update: (cache, addToCartData) => {
-                        if (addToCartData.errors) {
-                          return;
-                        }
-                        const cartData = cache.readQuery<CartQuery>({
-                          query: CartDocument,
-                        });
-
-                        cache.writeQuery<CartQuery>({
-                          query: CartDocument,
-                          data: {
-                            cart: [
-                              ...cartData!.cart,
-                              {
-                                nos: addToCartData.data!.addToCart.nos!,
-                                product: {
-                                  id: data.product.id,
-                                  name: data.product.name,
-                                  currency: data.product.currency,
-                                  imageUrl: data.product.imageUrl,
-                                  price: data.product.price,
-                                },
-                              },
-                            ],
-                          },
-                        });
-                      },
-                    });
-                  } catch (error) {
-                    console.log(error);
-                  }
-                }}
-              >
-                {!accessToken
-                  ? "Login to add to cart"
-                  : !isPresentInCart
-                  ? "Add to Cart"
-                  : "Checkout cart"}
-              </Button>
-            </div>
-            <div className={classes.buyNow}>
-              <Button
-                variant="contained"
-                color="secondary"
-                component={Link}
-                to={`/checkout?cart=false&id=${data.product.id}`}
-              >
-                Buy Now
-              </Button>
-            </div>
+            <Typography color="textSecondary">Price:</Typography>
+            <Typography variant="body1" color="secondary">
+              {price} {currency}
+            </Typography>
           </div>
-          <div className={classes.body}>
-            <Divider />
+          <div className={classes.addToCart}>
             <br />
-            <Typography variant="h6" gutterBottom>
-              About this product
-            </Typography>
-            <Typography variant="body2">{data.product.contents}</Typography>
+            <Button
+              disabled={loading}
+              variant="contained"
+              color="primary"
+              onClick={async () => {
+                if (!accessToken) {
+                  history.push("/login");
+                  return;
+                }
+                if (isPresentInCart) {
+                  history.push("/checkout?cart=true");
+                  return;
+                }
+                try {
+                  await addToCart({
+                    variables: {
+                      cart: {
+                        product: id,
+                      },
+                    },
+                    update: (cache, { data, errors }) => {
+                      if (errors) {
+                        return;
+                      }
+                      cache.writeQuery<CartQuery>({
+                        query: CartDocument,
+                        data: {
+                          cart: [
+                            ...cart.data!.cart,
+                            {
+                              nos: data!.addToCart.nos!,
+                              product: {
+                                id,
+                                name,
+                                currency,
+                                imageUrl,
+                                price,
+                              },
+                            },
+                          ],
+                        },
+                      });
+                    },
+                  });
+                } catch (error) {
+                  console.error(error);
+                }
+              }}
+            >
+              {!accessToken
+                ? "Login to add to cart"
+                : !isPresentInCart
+                ? "Add to Cart"
+                : "Checkout cart"}
+            </Button>
           </div>
+          <div className={classes.buyNow}>
+            <Button
+              variant="contained"
+              color="secondary"
+              component={Link}
+              to={`/checkout?cart=false&id=${id}`}
+            >
+              Buy Now
+            </Button>
+          </div>
+        </div>
+        <div className={classes.body}>
+          <Divider />
           <br />
-          <Divider className={classes.prodDivider} />
+          <Typography variant="h6" gutterBottom>
+            About this product
+          </Typography>
+          <Typography variant="body2">{contents}</Typography>
         </div>
         <br />
-        <div className={classes.prodFooter}>
-          <Typography gutterBottom variant="subtitle2" color="primary">
-            Product Description
-          </Typography>
-          <Typography variant="body2">{data.product.description}</Typography>
-        </div>
-      </Container>
-    );
-  }
-  return null;
+        <Divider className={classes.prodDivider} />
+      </div>
+      <br />
+      <div className={classes.prodFooter}>
+        <Typography gutterBottom variant="subtitle2" color="primary">
+          Product Description
+        </Typography>
+        <Typography variant="body2">{description}</Typography>
+      </div>
+    </Container>
+  );
 };
 
 export default Product;

@@ -28,7 +28,7 @@ const Menu: React.FC = () => {
   const { drawerState, setDrawerState } = useContext(DrawerContext)!;
   const history = useHistory();
   const location = useLocation();
-  const [logout] = useLogoutMutation({ fetchPolicy: "no-cache" });
+  const [logout, { loading }] = useLogoutMutation({ fetchPolicy: "no-cache" });
   const { accessToken, setAccessToken } = useContext(AccessTokenContext)!;
 
   const classes = useStyles();
@@ -105,6 +105,7 @@ const Menu: React.FC = () => {
     >
       {pathArray[1] !== "login" && pathArray[1] !== "signup" && (
         <Button
+          disabled={loading}
           className={classes.signUpBtn}
           color="secondary"
           size="large"

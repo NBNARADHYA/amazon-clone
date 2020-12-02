@@ -43,9 +43,7 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
   };
 
   const classes = useStyles();
-
   const { setAccessToken } = useContext(AccessTokenContext)!;
-
   const [login, { error }] = useLoginMutation({ fetchPolicy: "no-cache" });
 
   const [errOpen, setErrOpen] = useState<boolean>(false);
@@ -55,6 +53,7 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
       setErrOpen(true);
     }
   }, [error]);
+
   return (
     <Container className={classes.formContainer}>
       <Typography

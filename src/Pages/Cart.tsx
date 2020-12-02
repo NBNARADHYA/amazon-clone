@@ -20,8 +20,8 @@ import {
 
 const useStyles = makeStyles(() => ({
   spinner: {
-    left: "50%",
-    marginLeft: "-4em",
+    marginLeft: "47vw",
+    marginTop: "40vh",
   },
   productImg: {
     height: "165px",
@@ -72,15 +72,15 @@ const Cart: React.FC = () => {
 
   const { data, loading, error } = useCartQuery();
 
-  const [updateCart] = useUpdateCartMutation();
+  const [updateCart, { loading: updateLoading }] = useUpdateCartMutation();
   const { setDrawerState } = useContext(DrawerContext)!;
 
   if (loading || !data) {
-    return <CircularProgress className={classes.spinner} color="secondary" />;
+    return <CircularProgress className={classes.spinner} color="inherit" />;
   }
 
   if (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 
@@ -143,6 +143,7 @@ const Cart: React.FC = () => {
               <div className={classes.addRemove}>
                 <IconButton
                   size="medium"
+                  disabled={updateLoading}
                   onClick={async () => {
                     try {
                       await updateCart({
@@ -196,7 +197,7 @@ const Cart: React.FC = () => {
                   {nos}
                 </Typography>
                 <IconButton
-                  disabled={nos > 4}
+                  disabled={nos > 4 || updateLoading}
                   size="medium"
                   onClick={async () => {
                     try {
