@@ -62,8 +62,12 @@ const useStyles = makeStyles(() => ({
     textAlign: "center",
   },
   emptyCartHeader: {
-    marginTop: "15%",
+    paddingTop: "15%",
     textAlign: "center",
+  },
+  outerDiv: {
+    paddingTop: "7vh",
+    paddingBottom: "6vh",
   },
 }));
 
@@ -86,7 +90,7 @@ const Cart: React.FC = () => {
 
   if (!data.cart.length) {
     return (
-      <Container>
+      <Container className={classes.outerDiv}>
         <Typography
           variant="h3"
           color="secondary"

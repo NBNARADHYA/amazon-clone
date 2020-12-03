@@ -65,6 +65,10 @@ const useStyles = makeStyles(() => ({
     marginLeft: "47vw",
     marginTop: "40vh",
   },
+  outerDiv: {
+    paddingTop: "7vh",
+    paddingBottom: "6vh",
+  },
 }));
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE!);
@@ -140,7 +144,7 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
       ];
 
   return (
-    <>
+    <div className={classes.outerDiv}>
       <Container className={classes.cartContainer}>
         {currData!.map(({ nos, product }, index) => (
           <div key={index}>
@@ -226,7 +230,7 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
           </Alert>
         </Snackbar>
       </Container>
-    </>
+    </div>
   );
 };
 

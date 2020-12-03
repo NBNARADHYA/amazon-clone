@@ -20,8 +20,8 @@ ReactDOM.render(
               style={{
                 minHeight: "99vh",
                 position: "relative",
-                paddingBottom: "6vh",
-                paddingTop: "7vh",
+                // paddingBottom: "6vh",
+                // paddingTop: "7vh",
               }}
             >
               <Navbar />

@@ -62,6 +62,10 @@ const useStyles = makeStyles(() => ({
     padding: "20px",
     float: "right",
   },
+  outerDiv: {
+    paddingTop: "7vh",
+    paddingBottom: "6vh",
+  },
 }));
 
 const getDate = (timestamp: number): string => {
@@ -85,7 +89,7 @@ const Orders: React.FC = () => {
   }
 
   return (
-    <Container>
+    <Container className={classes.outerDiv}>
       <Typography
         variant="h4"
         color="secondary"

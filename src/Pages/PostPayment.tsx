@@ -6,8 +6,9 @@ import { Alert } from "@material-ui/lab";
 
 const useStyles = makeStyles(() => ({
   successAlert: {
-    marginTop: "10%",
     textAlign: "center",
+    paddingTop: "20vh",
+    paddingBottom: "6vh",
   },
 }));
 

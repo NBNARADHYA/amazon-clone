@@ -51,6 +51,10 @@ const useStyles = makeStyles(() => ({
     marginLeft: "47vw",
     marginTop: "40vh",
   },
+  outerDiv: {
+    paddingTop: "7vh",
+    paddingBottom: "6vh",
+  },
 }));
 
 const Category: React.FC = () => {
@@ -97,7 +101,7 @@ const Category: React.FC = () => {
   }
 
   return (
-    <>
+    <div className={classes.outerDiv}>
       <Container>
         <FormControl className={classes.formControl}>
           <InputLabel>Sort By</InputLabel>
@@ -148,7 +152,7 @@ const Category: React.FC = () => {
           />
         </div>
       )}
-    </>
+    </div>
   );
 };
 

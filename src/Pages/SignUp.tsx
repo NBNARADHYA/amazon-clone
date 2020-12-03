@@ -16,8 +16,8 @@ const useStyles = makeStyles(() => ({
   formContainer: {
     textAlign: "center",
     width: "28%",
-    paddingBottom: "50px",
-    paddingTop: "60px",
+    paddingTop: "10vh",
+    paddingBottom: "6vh",
   },
   formHeader: {
     fontSize: "35px",

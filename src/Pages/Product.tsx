@@ -22,7 +22,8 @@ import {
 const useStyles = makeStyles(() => ({
   prodContainer: {
     overflow: "auto",
-    marginTop: "50px",
+    paddingTop: "10vh",
+    paddingBottom: "6vh",
   },
   prodImg: {
     height: "500px",
