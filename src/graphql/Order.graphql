@@ -2,6 +2,7 @@ mutation CreateOrder($data: CreateOrderInput!) {
   createOrder(data: $data) {
     id
     createdAt
+    stripeId
   }
 }
 
@@ -19,7 +20,7 @@ query Orders {
     createdAt
     country
     state
-    pincode
+    postalCode
     city
     address
     products {

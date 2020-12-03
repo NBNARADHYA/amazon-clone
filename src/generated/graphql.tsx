@@ -63,10 +63,11 @@ export type Order = {
   __typename?: 'Order';
   id: Scalars['Int'];
   createdAt: Scalars['Float'];
+  status: Scalars['String'];
   address: Scalars['String'];
   country: Scalars['String'];
   state: Scalars['String'];
-  pincode: Scalars['String'];
+  postalCode: Scalars['String'];
   city: Scalars['String'];
   products: Array<OrderContent>;
 };
@@ -179,16 +180,12 @@ export type CreateOrderOutput = {
   __typename?: 'CreateOrderOutput';
   id: Scalars['Int'];
   createdAt: Scalars['Float'];
+  stripeId: Scalars['String'];
 };
 
 export type CreateOrderInput = {
   products: Array<ProductInput>;
   checkout: Scalars['Boolean'];
-  address: Scalars['String'];
-  country: Scalars['String'];
-  state: Scalars['String'];
-  pincode: Scalars['String'];
-  city: Scalars['String'];
 };
 
 export type AddToCartMutationVariables = Exact<{
@@ -238,7 +235,7 @@ export type CreateOrderMutation = (
   { __typename?: 'Mutation' }
   & { createOrder: (
     { __typename?: 'CreateOrderOutput' }
-    & Pick<CreateOrderOutput, 'id' | 'createdAt'>
+    & Pick<CreateOrderOutput, 'id' | 'createdAt' | 'stripeId'>
   ) }
 );
 
@@ -271,7 +268,7 @@ export type OrdersQuery = (
   { __typename?: 'Query' }
   & { orders: Array<(
     { __typename?: 'Order' }
-    & Pick<Order, 'id' | 'createdAt' | 'country' | 'state' | 'pincode' | 'city' | 'address'>
+    & Pick<Order, 'id' | 'createdAt' | 'country' | 'state' | 'postalCode' | 'city' | 'address'>
     & { products: Array<(
       { __typename?: 'OrderContent' }
       & Pick<OrderContent, 'nos'>
@@ -462,6 +459,7 @@ export const CreateOrderDocument = gql`
   createOrder(data: $data) {
     id
     createdAt
+    stripeId
   }
 }
     `;
@@ -559,7 +557,7 @@ export const OrdersDocument = gql`
     createdAt
     country
     state
-    pincode
+    postalCode
     city
     address
     products {

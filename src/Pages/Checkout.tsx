@@ -2,12 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
 import queryString from "query-string";
 import {
-  CartDocument,
-  CartQuery,
-  OrderContent,
-  OrdersDocument,
-  OrdersQuery,
-  Product,
   useCartLazyQuery,
   useCreateOrderMutation,
   useProductLazyQuery,
@@ -19,15 +13,13 @@ import {
   Divider,
   makeStyles,
   Snackbar,
-  TextField,
   Typography,
 } from "@material-ui/core";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import { ErrorAlert } from "./SignUp";
 import { Alert } from "@material-ui/lab";
+import { loadStripe } from "@stripe/stripe-js";
 
 const useStyles = makeStyles(() => ({
-  formContainer: {
+  checkoutBtn: {
     textAlign: "center",
     width: "28%",
     paddingBottom: "50px",
@@ -41,9 +33,6 @@ const useStyles = makeStyles(() => ({
     paddingBottom: "50px",
     paddingTop: "60px",
     float: "left",
-  },
-  formHeader: {
-    fontSize: "35px",
   },
   submitBtn: {
     width: "200px",
@@ -69,49 +58,16 @@ const useStyles = makeStyles(() => ({
   price: {
     float: "left",
   },
-  addRemove: {
-    float: "right",
-  },
   body: {
     marginTop: "30px",
-  },
-  nos: {
-    marginLeft: "5px",
-    marginRight: "5px",
-    fontSize: "18px",
-  },
-  header: {
-    marginTop: "20px",
-    marginBottom: "20px",
-    textAlign: "center",
   },
   spinner: {
     marginLeft: "47vw",
     marginTop: "40vh",
   },
-  successAlert: {
-    marginTop: "10%",
-    textAlign: "center",
-  },
 }));
 
-interface CheckoutFields {
-  address1: string;
-  address2: string;
-  pincode: string;
-  country: string;
-  state: string;
-  city: string;
-}
-
-type OrdersQueryProductsType = Array<
-  { __typename?: "OrderContent" } & Pick<OrderContent, "nos"> & {
-      product: { __typename?: "Product" } & Pick<
-        Product,
-        "id" | "name" | "price" | "currency" | "imageUrl"
-      >;
-    }
->;
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE!);
 
 const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
   const query = useMemo(() => queryString.parse(location.search), [
@@ -121,16 +77,22 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
   if (query["cart"] !== "true" && query["cart"] !== "false") {
     history.push("/");
   }
+
   const classes = useStyles();
+
   const [cartQuery, cart] = useCartLazyQuery();
   const [productQuery, product] = useProductLazyQuery();
-  const [errOpen, setErrOpen] = useState<boolean>(false);
-  const [success, setSuccess] = useState<boolean>(false);
+  const [createOrder, { error, loading }] = useCreateOrderMutation();
 
-  const [createOrder, { error }] = useCreateOrderMutation();
+  const [displayError, setDisplayError] = useState<null | {
+    [key: string]: any;
+  }>(null);
+
+  const [errOpen, setErrOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (error) {
+      setDisplayError(error);
       setErrOpen(true);
     }
   }, [error]);
@@ -161,31 +123,6 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
   ) {
     return <CircularProgress className={classes.spinner} color="inherit" />;
   }
-
-  if (success) {
-    return (
-      <Container className={classes.successAlert}>
-        <Alert
-          onClose={() => {
-            setSuccess(false);
-            history.push("/orders");
-          }}
-          severity="success"
-        >
-          Your order was placed successfully
-        </Alert>
-      </Container>
-    );
-  }
-
-  const initialValues: CheckoutFields = {
-    address1: "",
-    address2: "",
-    pincode: "",
-    country: "",
-    state: "",
-    city: "",
-  };
 
   const currData = isCart
     ? cart.data!.cart
@@ -233,32 +170,9 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
           </div>
         ))}
       </Container>
-      <Container className={classes.formContainer}>
-        <Formik
-          initialValues={initialValues}
-          validate={(values) => {
-            const errors: Partial<CheckoutFields> = {};
-            if (!values.address1) {
-              errors.address1 = "Address required";
-            }
-            if (!values.pincode) {
-              errors.pincode = "Pincode required";
-            }
-            if (!values.country) {
-              errors.country = "Country required";
-            }
-            if (!values.state) {
-              errors.state = "State required";
-            }
-            if (!values.city) {
-              errors.city = "City required";
-            }
-            return errors;
-          }}
-          onSubmit={async (
-            { address1, address2, pincode, country, state, city },
-            { setSubmitting }
-          ) => {
+      <Container className={classes.checkoutBtn}>
+        <Button
+          onClick={async () => {
             let products: {
               nos: number;
               product: string;
@@ -277,143 +191,40 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
                 product: product.id,
               }));
             }
-            await createOrder({
+            const result = await createOrder({
               variables: {
                 data: {
                   products,
                   checkout: isCart,
-                  address: address1 + address2,
-                  pincode,
-                  country,
-                  state,
-                  city,
                 },
               },
-              update: (cache, { errors, data: createOrderData }) => {
-                if (errors || !createOrderData) {
-                  return;
-                }
-                if (isCart) {
-                  cache.writeQuery<CartQuery>({
-                    query: CartDocument,
-                    data: {
-                      cart: [],
-                    },
-                  });
-                }
-
-                try {
-                  const currOrdersData = cache.readQuery<OrdersQuery>({
-                    query: OrdersDocument,
-                  });
-                  cache.writeQuery<OrdersQuery>({
-                    query: OrdersDocument,
-                    data: {
-                      orders: [
-                        ...currOrdersData!.orders,
-                        {
-                          address: address1 + address2,
-                          pincode,
-                          country,
-                          state,
-                          city,
-                          createdAt: createOrderData.createOrder.createdAt,
-                          id: createOrderData.createOrder.id,
-                          products: currData as OrdersQueryProductsType,
-                        },
-                      ],
-                    },
-                  });
-                } catch (error) {}
-              },
             });
-            setSuccess(true);
-            setSubmitting(false);
+            const stripe = await stripePromise;
+            const stripeRedirect = await stripe!.redirectToCheckout({
+              sessionId: result.data?.createOrder.stripeId!,
+            });
+            if (stripeRedirect?.error) {
+              setDisplayError(stripeRedirect.error);
+            }
           }}
+          size="large"
+          variant="contained"
+          color="secondary"
+          className={classes.submitBtn}
+          disabled={loading}
         >
-          {({ isSubmitting }) => (
-            <Form>
-              <Field
-                name="country"
-                as={TextField}
-                label="Country"
-                variant="outlined"
-                fullWidth
-              />
-              <ErrorMessage name="country" component={ErrorAlert} />
-              <br />
-              <br />
-              <Field
-                name="state"
-                as={TextField}
-                label="State"
-                variant="outlined"
-                fullWidth
-              />
-              <ErrorMessage name="state" component={ErrorAlert} />
-              <br />
-              <br />
-              <Field
-                name="city"
-                as={TextField}
-                label="City"
-                variant="outlined"
-                fullWidth
-              />
-              <ErrorMessage name="city" component={ErrorAlert} />
-              <br />
-              <br />
-              <Field
-                name="pincode"
-                as={TextField}
-                label="Pincode"
-                variant="outlined"
-                fullWidth
-              />
-              <ErrorMessage name="pincode" component={ErrorAlert} />
-              <br />
-              <br />
-              <Field
-                name="address1"
-                as={TextField}
-                label="Address Line 1"
-                variant="outlined"
-                fullWidth
-              />
-              <ErrorMessage name="address1" component={ErrorAlert} />
-              <br />
-              <br />
-              <Field
-                name="address2"
-                as={TextField}
-                label="Address Line 2"
-                variant="outlined"
-                fullWidth
-              />
-              <br />
-              <Button
-                type="submit"
-                size="large"
-                variant="contained"
-                color="secondary"
-                className={classes.submitBtn}
-                disabled={isSubmitting}
-              >
-                Place Order
-              </Button>
-              <Snackbar
-                open={errOpen}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-                autoHideDuration={6000}
-                onClose={() => setErrOpen(false)}
-              >
-                <Alert onClose={() => setErrOpen(false)} severity="error">
-                  {error && error.message}
-                </Alert>
-              </Snackbar>
-            </Form>
-          )}
-        </Formik>
+          Place Order
+        </Button>
+        <Snackbar
+          open={errOpen}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          autoHideDuration={6000}
+          onClose={() => setErrOpen(false)}
+        >
+          <Alert onClose={() => setErrOpen(false)} severity="error">
+            {displayError && displayError.message}
+          </Alert>
+        </Snackbar>
       </Container>
     </>
   );

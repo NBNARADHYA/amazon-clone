@@ -8,6 +8,7 @@ import Login from "./Pages/Login";
 import Cart from "./Pages/Cart";
 import Checkout from "./Pages/Checkout";
 import Orders from "./Pages/Orders";
+import PostPayment from "./Pages/PostPayment";
 
 const Routes: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const Routes: React.FC = () => {
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/orders" component={Orders} />
+      <Route path="/post_payment" component={PostPayment} />
       <Redirect to="/" />
     </Switch>
   );
