@@ -1,9 +1,11 @@
 import {
   Button,
   Container,
+  Grid,
   makeStyles,
   Snackbar,
   TextField,
+  Theme,
   Typography,
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
@@ -12,20 +14,32 @@ import React, { useEffect, useState } from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
 import { SignUpInputType, useSignUpMutation } from "../generated/graphql";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
   formContainer: {
     textAlign: "center",
-    width: "28%",
-    paddingTop: "10vh",
+    [theme.breakpoints.down("sm")]: {
+      width: "90%",
+    },
+    [theme.breakpoints.up("sm")]: {
+      width: "65%",
+    },
+    [theme.breakpoints.up("lg")]: {
+      width: "28%",
+    },
+    paddingTop: "15vh",
     paddingBottom: "6vh",
   },
   formHeader: {
     fontSize: "35px",
   },
   submitBtn: {
-    width: "200px",
-    fontSize: "20px",
-    marginTop: "20px",
+    [theme.breakpoints.down("lg")]: {
+      width: "50%",
+    },
+    [theme.breakpoints.up("lg")]: {
+      width: "40%",
+    },
+    fontSize: "17px",
   },
 }));
 
@@ -96,64 +110,70 @@ const SignUp: React.FC<RouteComponentProps> = ({ history }) => {
       >
         {({ isSubmitting }) => (
           <Form>
-            <Field
-              name="firstName"
-              as={TextField}
-              label="First Name"
-              variant="outlined"
-              fullWidth
-            />
-            <ErrorMessage name="firstName" component={ErrorAlert} />
-            <br />
-            <br />
-            <Field
-              name="lastName"
-              as={TextField}
-              label="Last Name"
-              variant="outlined"
-              fullWidth
-            />
-            <br />
-            <br />
-            <Field
-              name="email"
-              as={TextField}
-              label="Email"
-              variant="outlined"
-              fullWidth
-            />
-            <ErrorMessage name="email" component={ErrorAlert} />
-            <br />
-            <br />
-            <Field
-              name="password"
-              type="password"
-              as={TextField}
-              label="Password"
-              variant="outlined"
-              fullWidth
-            />
-            <ErrorMessage name="password" component={ErrorAlert} />
-            <br />
-            <Typography
-              variant="overline"
-              color="textSecondary"
-              component={Link}
-              to="/login"
-            >
-              Already signed up ?
-            </Typography>
-            <br />
-            <Button
-              type="submit"
-              size="large"
-              variant="contained"
-              color="secondary"
-              className={classes.submitBtn}
-              disabled={isSubmitting}
-            >
-              Sign Up
-            </Button>
+            <Grid container direction="column" spacing={2}>
+              <Grid item xs={12}>
+                <Field
+                  name="firstName"
+                  as={TextField}
+                  label="First Name"
+                  variant="outlined"
+                  fullWidth
+                />
+                <ErrorMessage name="firstName" component={ErrorAlert} />
+              </Grid>
+              <Grid item xs={12}>
+                <Field
+                  name="lastName"
+                  as={TextField}
+                  label="Last Name"
+                  variant="outlined"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Field
+                  name="email"
+                  as={TextField}
+                  label="Email"
+                  variant="outlined"
+                  fullWidth
+                />
+                <ErrorMessage name="email" component={ErrorAlert} />
+              </Grid>
+              <Grid item xs={12}>
+                <Field
+                  name="password"
+                  type="password"
+                  as={TextField}
+                  label="Password"
+                  variant="outlined"
+                  fullWidth
+                />
+                <ErrorMessage name="password" component={ErrorAlert} />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography
+                  variant="overline"
+                  color="textSecondary"
+                  component={Link}
+                  to="/login"
+                >
+                  Already signed up ?
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  type="submit"
+                  size="large"
+                  variant="contained"
+                  color="secondary"
+                  className={classes.submitBtn}
+                  disabled={isSubmitting}
+                >
+                  Sign Up
+                </Button>
+              </Grid>
+            </Grid>
             <Snackbar
               open={errOpen}
               anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
