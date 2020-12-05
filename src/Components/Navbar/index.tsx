@@ -5,8 +5,9 @@ import {
   InputBase,
   Toolbar,
   Typography,
+  useMediaQuery,
 } from "@material-ui/core";
-import { fade, makeStyles } from "@material-ui/core/styles";
+import { fade, makeStyles, useTheme } from "@material-ui/core/styles";
 import {
   MenuRounded as MenuIcon,
   SearchRounded as SearchIcon,
@@ -24,17 +25,17 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#333333",
   },
   menuIcon: {
-    marginRight: "20px",
+    marginRight: "1vw",
     color: "#e6e6e6",
   },
   search: {
     width: "80%",
     color: "#333333",
-    marginLeft: "100px",
+    marginLeft: "5vw",
     height: "35px",
-    paddingLeft: "10px",
-    paddingTop: "2px",
-    marginRight: "3px",
+    paddingLeft: "1vw",
+    paddingTop: "1.8px",
+    marginRight: "0.5vw",
     borderRadius: theme.shape.borderRadius,
     backgroundColor: fade(theme.palette.common.white, 0.7),
     "&:hover": {
@@ -50,26 +51,27 @@ const useStyles = makeStyles((theme) => ({
     color: "#e6e6e6",
   },
   searchForm: {
-    width: "70%",
+    width: "70vw",
   },
   cart: {
     color: "white",
     fontSize: "large",
     position: "absolute",
-    right: "15px",
+    right: "1vw",
   },
 }));
 
 const Navbar: React.FC = () => {
   const { setDrawerState } = useContext(DrawerContext)!;
+  const { accessToken, setAccessToken } = useContext(AccessTokenContext)!;
   const { setSearchInCatString } = useContext(SearchInCategoryContext)!;
 
   const [searchString, setSearchString] = useState("");
   const classes = useStyles();
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up("md"));
 
   const location = useLocation();
-
-  const { accessToken, setAccessToken } = useContext(AccessTokenContext)!;
 
   useEffect(() => {
     const localAccessToken = localStorage.getItem("accessToken");
@@ -92,7 +94,7 @@ const Navbar: React.FC = () => {
 
   return (
     <AppBar className={classes.appBar}>
-      <Menu />
+      <Menu catPlaceHolder={catPlaceHolder} />
       <Toolbar>
         <IconButton edge="start" onClick={() => setDrawerState(-1)}>
           <MenuIcon className={classes.menuIcon} />
@@ -105,34 +107,37 @@ const Navbar: React.FC = () => {
         >
           Amazon Clone
         </Typography>
-        <form
-          className={classes.searchForm}
-          onSubmit={(e) => {
-            e.preventDefault();
-            setSearchInCatString(searchString);
-          }}
-        >
-          <InputBase
-            fullWidth
-            className={classes.search}
-            placeholder={`Search ${catPlaceHolder}`}
-            value={searchString}
-            onChange={(e) => {
-              setSearchString(e.target.value);
-              if (e.target.value === "") {
-                setSearchInCatString("");
-              }
-            }}
-          />
-          <IconButton className={classes.searchBtn} type="submit">
-            <SearchIcon />
-          </IconButton>
-        </form>
-
-        {accessToken && (
-          <IconButton className={classes.cart} component={Link} to="/cart">
-            <CartIcon />
-          </IconButton>
+        {matches && (
+          <>
+            <form
+              className={classes.searchForm}
+              onSubmit={(e) => {
+                e.preventDefault();
+                setSearchInCatString(searchString);
+              }}
+            >
+              <InputBase
+                fullWidth
+                className={classes.search}
+                placeholder={`Search ${catPlaceHolder}`}
+                value={searchString}
+                onChange={(e) => {
+                  setSearchString(e.target.value);
+                  if (e.target.value === "") {
+                    setSearchInCatString("");
+                  }
+                }}
+              />
+              <IconButton className={classes.searchBtn} type="submit">
+                <SearchIcon />
+              </IconButton>
+            </form>
+            {accessToken && (
+              <IconButton className={classes.cart} component={Link} to="/cart">
+                <CartIcon />
+              </IconButton>
+            )}
+          </>
         )}
       </Toolbar>
     </AppBar>

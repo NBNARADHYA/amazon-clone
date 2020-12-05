@@ -2,12 +2,16 @@ import {
   Button,
   Divider,
   Drawer,
+  Grid,
   IconButton,
   List,
   ListItem,
   ListItemText,
   makeStyles,
+  TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@material-ui/core";
 import React, { useMemo, useContext } from "react";
 import { ArrowBackRounded } from "@material-ui/icons";
@@ -16,22 +20,37 @@ import DrawerContext from "../../Context/Drawer";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import { useLogoutMutation } from "../../generated/graphql";
 import AccessTokenContext from "../../Context/AccessToken";
+import SearchInCategoryContext from "../../Context/SearchInCategory";
+import { Field, Form, Formik } from "formik";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   signUpBtn: {},
   userActions: {
-    marginBottom: "15px",
+    marginBottom: "2vw",
+  },
+  search: {
+    padding: "1vh",
+    flexGrow: 1,
   },
 }));
 
-const Menu: React.FC = () => {
-  const { drawerState, setDrawerState } = useContext(DrawerContext)!;
+interface Props {
+  catPlaceHolder: string;
+}
+
+const Menu: React.FC<Props> = ({ catPlaceHolder }) => {
   const history = useHistory();
   const location = useLocation();
-  const [logout, { loading }] = useLogoutMutation({ fetchPolicy: "no-cache" });
-  const { accessToken, setAccessToken } = useContext(AccessTokenContext)!;
 
   const classes = useStyles();
+  const theme = useTheme();
+  const isExtraSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const [logout, { loading }] = useLogoutMutation({ fetchPolicy: "no-cache" });
+
+  const { drawerState, setDrawerState } = useContext(DrawerContext)!;
+  const { accessToken, setAccessToken } = useContext(AccessTokenContext)!;
+  const { setSearchInCatString } = useContext(SearchInCategoryContext)!;
 
   const pathArray = location.pathname.split("/");
 
@@ -103,6 +122,55 @@ const Menu: React.FC = () => {
       open={drawerState !== null}
       onClose={() => setDrawerState(null)}
     >
+      {isExtraSmallScreen && (
+        <>
+          <Formik
+            initialValues={{
+              search: "",
+            }}
+            onSubmit={({ search }, { setSubmitting }) => {
+              setSearchInCatString(search);
+              setSubmitting(false);
+              search !== "" && setDrawerState(null);
+            }}
+          >
+            {({ isSubmitting }) => (
+              <Form>
+                <Grid
+                  container
+                  className={classes.search}
+                  alignItems="center"
+                  justify="center"
+                  direction="column"
+                  spacing={1}
+                >
+                  <Grid item xs={12}>
+                    <Field
+                      fullwidth
+                      name="search"
+                      as={TextField}
+                      variant="outlined"
+                      label={`Search ${catPlaceHolder}`}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Button
+                      type="submit"
+                      size="medium"
+                      variant="contained"
+                      color="secondary"
+                      disabled={isSubmitting}
+                    >
+                      Search
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Form>
+            )}
+          </Formik>
+          <Divider />
+        </>
+      )}
       {pathArray[1] !== "login" && pathArray[1] !== "signup" && (
         <Button
           disabled={loading}
