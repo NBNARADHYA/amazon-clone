@@ -1,22 +1,17 @@
 import React from "react";
-import { Typography } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
 
 const useStyles = makeStyles(() => ({
   footer: {
-    backgroundColor: "#4d4d4d",
-    color: "#e6e6e6",
     height: "5vh",
-    display: "flex",
     position: "absolute",
     bottom: "0",
     width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
   },
   link: {
-    color: "#e6e6e6",
+    color: "#757575",
   },
 }));
 
@@ -37,9 +32,16 @@ const Copyright: React.FC = () => {
 const Footer: React.FC = () => {
   const classes = useStyles();
   return (
-    <div className={classes.footer}>
-      <Copyright />
-    </div>
+    <Grid
+      container
+      justify="center"
+      alignItems="center"
+      className={classes.footer}
+    >
+      <Grid item>
+        <Copyright />
+      </Grid>
+    </Grid>
   );
 };
 

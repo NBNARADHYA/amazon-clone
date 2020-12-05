@@ -18,10 +18,8 @@ ReactDOM.render(
           <BrowserRouter>
             <div
               style={{
-                minHeight: "99vh",
+                minHeight: "98vh",
                 position: "relative",
-                // paddingBottom: "6vh",
-                // paddingTop: "7vh",
               }}
             >
               <Navbar />
