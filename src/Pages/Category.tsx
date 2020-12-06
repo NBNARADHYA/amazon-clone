@@ -20,9 +20,9 @@ import { Exact, ProductsQuery, useProductsQuery } from "../generated/graphql";
 
 const useStyles = makeStyles((theme: Theme) => ({
   pagination: {
-    position: "absolute",
+    top: "auto",
     bottom: "6vh",
-    marginTop: "5%",
+    marginTop: "3%",
   },
   productImg: {
     [theme.breakpoints.down("sm")]: {
@@ -164,7 +164,7 @@ const Category: React.FC = () => {
       </Container>
       {data && (
         <Grid container justify="center">
-          <Grid item xs={12} className={classes.pagination}>
+          <Grid item className={classes.pagination}>
             <Pagination
               page={page}
               shape="rounded"
