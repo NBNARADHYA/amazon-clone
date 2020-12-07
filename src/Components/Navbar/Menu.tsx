@@ -44,7 +44,7 @@ const Menu: React.FC<Props> = ({ catPlaceHolder }) => {
 
   const classes = useStyles();
   const theme = useTheme();
-  const isExtraSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isXs = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [logout, { loading }] = useLogoutMutation({ fetchPolicy: "no-cache" });
 
@@ -122,7 +122,7 @@ const Menu: React.FC<Props> = ({ catPlaceHolder }) => {
       open={drawerState !== null}
       onClose={() => setDrawerState(null)}
     >
-      {isExtraSmallScreen && (
+      {isXs && (
         <>
           <Formik
             initialValues={{
