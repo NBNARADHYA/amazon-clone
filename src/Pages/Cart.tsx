@@ -6,6 +6,8 @@ import {
   Typography,
   IconButton,
   Button,
+  Grid,
+  Theme,
 } from "@material-ui/core";
 import { Add, Remove } from "@material-ui/icons";
 import React, { useContext } from "react";
@@ -18,35 +20,38 @@ import {
   useUpdateCartMutation,
 } from "../generated/graphql";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
   spinner: {
     marginLeft: "47vw",
     marginTop: "40vh",
   },
   productImg: {
-    height: "165px",
-    float: "left",
-    marginRight: "50px",
+    [theme.breakpoints.down("sm")]: {
+      width: "40%",
+    },
+    [theme.breakpoints.between("sm", "md")]: {
+      width: "50%",
+    },
+    [theme.breakpoints.up("lg")]: {
+      width: "55%",
+    },
   },
   link: {
     textDecoration: "none",
   },
-  productDiv: {
-    overflow: "auto",
-    marginTop: "20px",
-  },
   divider: {
-    marginTop: "10px",
-    marginBottom: "20px",
-  },
-  price: {
-    float: "left",
-  },
-  addRemove: {
-    float: "right",
-  },
-  body: {
-    marginTop: "30px",
+    [theme.breakpoints.down("sm")]: {
+      paddingTop: "6%",
+      paddingBottom: "12%",
+    },
+    [theme.breakpoints.between("sm", "md")]: {
+      paddingTop: "4%",
+      paddingBottom: "8%",
+    },
+    [theme.breakpoints.up("lg")]: {
+      paddingTop: "2%",
+      paddingBottom: "4%",
+    },
   },
   nos: {
     marginLeft: "5px",
@@ -54,8 +59,6 @@ const useStyles = makeStyles(() => ({
     fontSize: "18px",
   },
   header: {
-    marginTop: "20px",
-    marginBottom: "20px",
     textAlign: "center",
   },
   checkoutBtn: {
@@ -114,144 +117,164 @@ const Cart: React.FC = () => {
     );
   }
   return (
-    <Container>
-      <Typography
-        variant="h4"
-        color="secondary"
-        gutterBottom
-        className={classes.header}
-      >
-        My Cart
-      </Typography>
-      <Divider className={classes.divider} />
-      {data.cart.map(({ nos, product }, index) => (
-        <div key={index}>
-          <div className={classes.productDiv}>
-            <img
-              src={product.imageUrl!}
-              alt={product.name}
-              className={classes.productImg}
-            />
-            <Typography
-              variant="body1"
-              component={Link}
-              to={`/products/${product.id}`}
-              className={classes.link}
+    <Container className={classes.outerDiv}>
+      <Grid container spacing={1} className={classes.divider}>
+        <Grid item xs={12}>
+          <Typography
+            variant="h4"
+            color="secondary"
+            gutterBottom
+            className={classes.header}
+          >
+            My Cart
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider />
+        </Grid>
+      </Grid>
+      <Grid container spacing={2} direction="column">
+        {data.cart.map(({ nos, product }, index) => (
+          <Grid item container spacing={3} key={index}>
+            <Grid item xs={12} sm={6} md={4}>
+              <img
+                src={product.imageUrl!}
+                alt={product.name}
+                className={classes.productImg}
+              />
+            </Grid>
+            <Grid
+              item
+              container
+              spacing={1}
+              xs={12}
+              sm={6}
+              md={8}
+              direction="column"
             >
-              {product.name}
-            </Typography>
-            <div className={classes.body}>
-              <Typography variant="body1" className={classes.price}>
-                {product.price} {product.currency}
-              </Typography>
-              <div className={classes.addRemove}>
-                <IconButton
-                  size="medium"
-                  disabled={updateLoading}
-                  onClick={async () => {
-                    try {
-                      await updateCart({
-                        variables: {
-                          cart: {
-                            nos: nos - 1,
-                            product: product.id,
+              <Grid item>
+                <Typography
+                  variant="body1"
+                  component={Link}
+                  to={`/products/${product.id}`}
+                  className={classes.link}
+                >
+                  {product.name}
+                </Typography>
+              </Grid>
+              <Grid item container spacing={1} justify="space-evenly">
+                <Grid item xs={6}>
+                  <Typography variant="body1">
+                    {product.price} {product.currency}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <IconButton
+                    size="medium"
+                    disabled={updateLoading}
+                    onClick={async () => {
+                      try {
+                        await updateCart({
+                          variables: {
+                            cart: {
+                              nos: nos - 1,
+                              product: product.id,
+                            },
                           },
-                        },
-                        update: (cache, updateCartData) => {
-                          if (updateCartData.errors) {
-                            return;
-                          }
-                          const cartIdx = data.cart.findIndex(
-                            (ele) => ele.product.id === product.id
-                          );
+                          update: (cache, updateCartData) => {
+                            if (updateCartData.errors) {
+                              return;
+                            }
+                            const cartIdx = data.cart.findIndex(
+                              (ele) => ele.product.id === product.id
+                            );
 
-                          let newCart = [...data.cart.slice(0, cartIdx)];
-                          if (nos > 1) {
+                            let newCart = [...data.cart.slice(0, cartIdx)];
+                            if (nos > 1) {
+                              const newCartProd = {
+                                ...data.cart[cartIdx],
+                                nos: nos - 1,
+                              };
+                              newCart = [...newCart, newCartProd];
+                            }
+                            newCart = [
+                              ...newCart,
+                              ...data.cart.slice(cartIdx + 1),
+                            ];
+
+                            cache.writeQuery<CartQuery>({
+                              query: CartDocument,
+                              data: {
+                                cart: newCart,
+                              },
+                            });
+                          },
+                        });
+                      } catch (error) {
+                        console.error(error);
+                      }
+                    }}
+                  >
+                    <Remove color="secondary" />
+                  </IconButton>
+                  <Typography
+                    variant="button"
+                    color="primary"
+                    className={classes.nos}
+                  >
+                    {nos}
+                  </Typography>
+                  <IconButton
+                    disabled={nos > 4 || updateLoading}
+                    size="medium"
+                    onClick={async () => {
+                      try {
+                        await updateCart({
+                          variables: {
+                            cart: {
+                              nos: nos + 1,
+                              product: product.id,
+                            },
+                          },
+                          update: (cache, updateCartData) => {
+                            if (updateCartData.errors) {
+                              return;
+                            }
+                            const cartIdx = data.cart.findIndex(
+                              (ele) => ele.product.id === product.id
+                            );
                             const newCartProd = {
                               ...data.cart[cartIdx],
-                              nos: nos - 1,
+                              nos: nos + 1,
                             };
-                            newCart = [...newCart, newCartProd];
-                          }
-                          newCart = [
-                            ...newCart,
-                            ...data.cart.slice(cartIdx + 1),
-                          ];
-
-                          cache.writeQuery<CartQuery>({
-                            query: CartDocument,
-                            data: {
-                              cart: newCart,
-                            },
-                          });
-                        },
-                      });
-                    } catch (error) {
-                      console.error(error);
-                    }
-                  }}
-                >
-                  <Remove color="secondary" />
-                </IconButton>
-                <Typography
-                  variant="button"
-                  color="primary"
-                  className={classes.nos}
-                >
-                  {nos}
-                </Typography>
-                <IconButton
-                  disabled={nos > 4 || updateLoading}
-                  size="medium"
-                  onClick={async () => {
-                    try {
-                      await updateCart({
-                        variables: {
-                          cart: {
-                            nos: nos + 1,
-                            product: product.id,
+                            cache.writeQuery<CartQuery>({
+                              query: CartDocument,
+                              data: {
+                                cart: [
+                                  ...data.cart.slice(0, cartIdx),
+                                  newCartProd,
+                                  ...data.cart.slice(cartIdx + 1),
+                                ],
+                              },
+                            });
                           },
-                        },
-                        update: (cache, updateCartData) => {
-                          if (updateCartData.errors) {
-                            return;
-                          }
-                          const cartIdx = data.cart.findIndex(
-                            (ele) => ele.product.id === product.id
-                          );
-
-                          const newCartProd = {
-                            ...data.cart[cartIdx],
-                            nos: nos + 1,
-                          };
-
-                          cache.writeQuery<CartQuery>({
-                            query: CartDocument,
-                            data: {
-                              cart: [
-                                ...data.cart.slice(0, cartIdx),
-                                newCartProd,
-                                ...data.cart.slice(cartIdx + 1),
-                              ],
-                            },
-                          });
-                        },
-                      });
-                    } catch (error) {
-                      console.error(error);
-                    }
-                  }}
-                >
-                  <Add color="secondary" />
-                </IconButton>
-              </div>
-            </div>
-          </div>
-          <div className={classes.divider}>
-            <Divider />
-          </div>
-        </div>
-      ))}
+                        });
+                      } catch (error) {
+                        console.error(error);
+                      }
+                    }}
+                  >
+                    <Add color="secondary" />
+                  </IconButton>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs={12} className={classes.divider}>
+              <Divider />
+            </Grid>
+          </Grid>
+        ))}
+      </Grid>
       <br />
       <div className={classes.checkoutBtn}>
         <Button

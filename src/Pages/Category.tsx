@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     [theme.breakpoints.down("sm")]: {
       width: "40%",
     },
-    [theme.breakpoints.between("sm", "lg")]: {
+    [theme.breakpoints.between("sm", "md")]: {
       width: "50%",
     },
     [theme.breakpoints.up("lg")]: {
@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme: Theme) => ({
       paddingTop: "6%",
       paddingBottom: "12%",
     },
-    [theme.breakpoints.between("sm", "lg")]: {
+    [theme.breakpoints.between("sm", "md")]: {
       paddingTop: "4%",
       paddingBottom: "8%",
     },
@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     [theme.breakpoints.down("sm")]: {
       minWidth: "30%",
     },
-    [theme.breakpoints.between("sm", "lg")]: {
+    [theme.breakpoints.between("sm", "md")]: {
       minWidth: "15%",
     },
     [theme.breakpoints.up("lg")]: {
@@ -141,18 +141,30 @@ const Category: React.FC = () => {
                     className={classes.productImg}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6} md={8}>
-                  <Typography
-                    variant="body1"
-                    component={Link}
-                    to={`/products/${product.id}`}
-                    className={classes.link}
-                  >
-                    {product.name}
-                  </Typography>
-                  <Typography variant="body1">
-                    {product.price} {product.currency}
-                  </Typography>
+                <Grid
+                  item
+                  container
+                  spacing={1}
+                  xs={12}
+                  sm={6}
+                  md={8}
+                  direction="column"
+                >
+                  <Grid item>
+                    <Typography
+                      variant="body1"
+                      component={Link}
+                      to={`/products/${product.id}`}
+                      className={classes.link}
+                    >
+                      {product.name}
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="body1">
+                      {product.price} {product.currency}
+                    </Typography>
+                  </Grid>
                 </Grid>
                 <Grid item xs={12} className={classes.divider}>
                   <Divider />
