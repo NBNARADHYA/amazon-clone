@@ -9,64 +9,55 @@ import {
 import {
   Button,
   CircularProgress,
-  Container,
   Divider,
+  Grid,
   makeStyles,
   Snackbar,
+  Theme,
   Typography,
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import { loadStripe } from "@stripe/stripe-js";
 
-const useStyles = makeStyles(() => ({
-  checkoutBtn: {
-    textAlign: "center",
-    width: "28%",
-    paddingBottom: "50px",
-    paddingTop: "60px",
-    float: "right",
-    marginRight: "5%",
-  },
-  cartContainer: {
-    textAlign: "center",
-    width: "60%",
-    paddingBottom: "50px",
-    paddingTop: "60px",
-    float: "left",
-  },
+const useStyles = makeStyles((theme: Theme) => ({
   submitBtn: {
-    width: "200px",
-    fontSize: "20px",
-    marginTop: "20px",
+    width: "40%",
+    fontSize: "100%",
   },
   productImg: {
-    height: "165px",
-    float: "left",
-    marginRight: "50px",
+    [theme.breakpoints.down("sm")]: {
+      width: "40%",
+    },
+    [theme.breakpoints.between("sm", "md")]: {
+      width: "50%",
+    },
+    [theme.breakpoints.up("lg")]: {
+      width: "55%",
+    },
   },
   link: {
     textDecoration: "none",
   },
-  productDiv: {
-    overflow: "auto",
-    marginTop: "20px",
-  },
   divider: {
-    marginTop: "10px",
-    marginBottom: "20px",
-  },
-  price: {
-    float: "left",
-  },
-  body: {
-    marginTop: "30px",
+    [theme.breakpoints.down("sm")]: {
+      paddingTop: "6%",
+      paddingBottom: "12%",
+    },
+    [theme.breakpoints.between("sm", "md")]: {
+      paddingTop: "4%",
+      paddingBottom: "8%",
+    },
+    [theme.breakpoints.up("lg")]: {
+      paddingTop: "2%",
+      paddingBottom: "4%",
+    },
   },
   spinner: {
     marginLeft: "47vw",
     marginTop: "40vh",
   },
   outerDiv: {
-    paddingTop: "7vh",
+    paddingTop: "10vh",
     paddingBottom: "6vh",
   },
 }));
@@ -144,37 +135,54 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
       ];
 
   return (
-    <div className={classes.outerDiv}>
-      <Container className={classes.cartContainer}>
+    <Grid
+      container
+      spacing={3}
+      className={classes.outerDiv}
+      justify="space-evenly"
+    >
+      <Grid item container xs={12} lg={8} direction="column" spacing={2}>
         {currData!.map(({ nos, product }, index) => (
-          <div key={index}>
-            <div className={classes.productDiv}>
+          <Grid container item key={index}>
+            <Grid item xs={12} sm={6} md={4}>
               <img
                 src={product.imageUrl!}
                 alt={product.name}
                 className={classes.productImg}
               />
-              <Typography
-                variant="body1"
-                component={Link}
-                to={`/products/${product.id}`}
-                className={classes.link}
-              >
-                {product.name}
-              </Typography>
-              <div className={classes.body}>
-                <Typography variant="body1" className={classes.price}>
+            </Grid>
+            <Grid
+              item
+              container
+              spacing={1}
+              xs={12}
+              sm={6}
+              md={8}
+              direction="column"
+            >
+              <Grid item>
+                <Typography
+                  variant="body1"
+                  component={Link}
+                  to={`/products/${product.id}`}
+                  className={classes.link}
+                >
+                  {product.name}
+                </Typography>
+              </Grid>
+              <Grid item>
+                <Typography variant="body1">
                   {product.price} {product.currency}
                 </Typography>
-              </div>
-            </div>
-            <div className={classes.divider}>
+              </Grid>
+            </Grid>
+            <Grid item xs={12} className={classes.divider}>
               <Divider />
-            </div>
-          </div>
+            </Grid>
+          </Grid>
         ))}
-      </Container>
-      <Container className={classes.checkoutBtn}>
+      </Grid>
+      <Grid item xs={12} lg={4}>
         <Button
           onClick={async () => {
             let products: {
@@ -203,6 +211,9 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
                 },
               },
             });
+            if (result.errors) {
+              setDisplayError(result.errors);
+            }
             const stripe = await stripePromise;
             const stripeRedirect = await stripe!.redirectToCheckout({
               sessionId: result.data?.createOrder.stripeId!,
@@ -229,8 +240,8 @@ const Checkout: React.FC<RouteComponentProps> = ({ location, history }) => {
             {displayError && displayError.message}
           </Alert>
         </Snackbar>
-      </Container>
-    </div>
+      </Grid>
+    </Grid>
   );
 };
 
