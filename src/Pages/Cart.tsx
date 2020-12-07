@@ -8,6 +8,8 @@ import {
   Button,
   Grid,
   Theme,
+  useTheme,
+  useMediaQuery,
 } from "@material-ui/core";
 import { Add, Remove } from "@material-ui/icons";
 import React, { useContext } from "react";
@@ -82,6 +84,10 @@ const Cart: React.FC = () => {
   const [updateCart, { loading: updateLoading }] = useUpdateCartMutation();
   const { setDrawerState } = useContext(DrawerContext)!;
 
+  const theme = useTheme();
+  const isSmOrXs = useMediaQuery(theme.breakpoints.down("md"));
+  const isMd = useMediaQuery(theme.breakpoints.only("md"));
+
   if (loading || !data) {
     return <CircularProgress className={classes.spinner} color="inherit" />;
   }
@@ -95,7 +101,7 @@ const Cart: React.FC = () => {
     return (
       <Container className={classes.outerDiv}>
         <Typography
-          variant="h3"
+          variant={isSmOrXs ? "h4" : isMd ? "h3" : "h2"}
           color="secondary"
           gutterBottom
           className={classes.emptyCartHeader}
@@ -108,7 +114,10 @@ const Cart: React.FC = () => {
             style={{ marginTop: "100px" }}
             onClick={() => setDrawerState(-1)}
           >
-            <Typography variant="h2" color="textSecondary">
+            <Typography
+              variant={isSmOrXs ? "h5" : isMd ? "h4" : "h3"}
+              color="textSecondary"
+            >
               All Categories
             </Typography>
           </Button>
