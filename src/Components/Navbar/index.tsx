@@ -69,7 +69,7 @@ const Navbar: React.FC = () => {
   const [searchString, setSearchString] = useState("");
   const classes = useStyles();
   const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.up("md"));
+  const isLgOrXl = useMediaQuery(theme.breakpoints.up("md"));
 
   const location = useLocation();
 
@@ -107,7 +107,7 @@ const Navbar: React.FC = () => {
         >
           Amazon Clone
         </Typography>
-        {matches && (
+        {isLgOrXl && (
           <>
             <form
               className={classes.searchForm}
